@@ -1,0 +1,45 @@
+:root {
+    --utetra-brown: #7a4b2a;
+    --utetra-cream: #fff6ea;
+    --utetra-accent: #d9822b;
+}
+
+body {
+    background-color: var(--utetra-cream);
+}
+
+.utetra-navbar {
+    background-color: var(--utetra-brown);
+}
+
+.utetra-navbar-staff {
+    background-color: #2f6b5a;
+}
+
+.utetra-sidebar {
+    width: 250px;
+    min-height: 100vh;
+    background-color: #3b2a1e;
+}
+
+.utetra-footer {
+    background-color: var(--utetra-brown);
+    color: #f3e3d0;
+}
+
+.btn-utetra {
+    background-color: var(--utetra-accent);
+    border-color: var(--utetra-accent);
+    color: #fff;
+}
+
+.btn-utetra:hover {
+    background-color: #b96d1f;
+    border-color: #b96d1f;
+    color: #fff;
+}
+
+.stat-card .display-6 {
+    color: var(--utetra-brown);
+    font-weight: 700;
+}

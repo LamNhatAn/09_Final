@@ -1,0 +1,39 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title><sitemesh:write property='title'/> | UTETra Admin</title>
+    <link rel="stylesheet" href="<c:url value='/webjars/bootstrap/5.3.3/css/bootstrap.min.css'/>">
+    <link rel="stylesheet" href="<c:url value='/css/app.css'/>">
+    <sitemesh:write property='head'/>
+</head>
+<body class="bg-light">
+
+<div class="d-flex">
+    <aside class="utetra-sidebar p-3 text-white">
+        <a class="d-block fs-5 fw-bold text-white text-decoration-none mb-4" href="<c:url value='/admin/dashboard'/>">
+            🧋 UTETra <span class="badge bg-warning text-dark">Admin</span>
+        </a>
+        <ul class="nav flex-column gap-1">
+            <li class="nav-item"><a class="nav-link text-white" href="<c:url value='/admin/dashboard'/>">Tổng quan</a></li>
+            <li class="nav-item"><a class="nav-link text-white-50 disabled" href="#">Danh mục / Sản phẩm</a></li>
+            <li class="nav-item"><a class="nav-link text-white-50 disabled" href="#">Đơn hàng</a></li>
+            <li class="nav-item"><a class="nav-link text-white-50 disabled" href="#">Chi nhánh</a></li>
+            <li class="nav-item"><a class="nav-link text-white-50 disabled" href="#">Người dùng / Nhân viên</a></li>
+            <li class="nav-item"><a class="nav-link text-white-50 disabled" href="#">Hỗ trợ khách (chat)</a></li>
+        </ul>
+        <hr>
+        <a class="nav-link text-white-50 px-0" href="<c:url value='/'/>">← Về trang web</a>
+    </aside>
+
+    <div class="flex-grow-1 p-4">
+        <sitemesh:write property='body'/>
+    </div>
+</div>
+
+<script src="<c:url value='/webjars/bootstrap/5.3.3/js/bootstrap.bundle.min.js'/>"></script>
+</body>
+</html>

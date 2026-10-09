@@ -1,0 +1,16 @@
+# Sao chep file nay thanh application-local.properties (cung thu muc goc du an) va dien gia tri that.
+# KHONG commit file application-local.properties len Git.
+
+DB_HOST=localhost
+DB_PORT=1433
+DB_NAME=utetra
+DB_USERNAME=utetra_app
+DB_PASSWORD=DOI_MAT_KHAU_CUA_BAN
+
+# Cac muc duoi day dung o cac ngay sau
+# jwt.secret=
+# cloudinary.cloud-name=
+# cloudinary.api-key=
+# cloudinary.api-secret=
+# vnpay.tmn-code=
+# vnpay.hash-secret=

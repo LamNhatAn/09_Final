@@ -1,0 +1,19 @@
+# Bi mat
+application-local.properties
+
+# Build
+target/
+*.war
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.classpath
+.project
+.settings/
+.factorypath
+
+# He dieu hanh
+.DS_Store
+Thumbs.db
