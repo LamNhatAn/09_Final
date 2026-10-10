@@ -103,3 +103,4 @@ Unit test: `.\mvnw.cmd "-Dtest=JwtServiceTest" test` (5 test: token hợp lệ, 
 - **Vì sao báo lỗi chung cho sai email và sai mật khẩu?** Để kẻ xấu không dò được email nào có trong hệ thống.
 - **`next` có nguy hiểm không?** Có thể bị lợi dụng chuyển hướng sang trang khác (open redirect), nên chỉ chấp nhận đường dẫn nội bộ bắt đầu bằng `/` (không phải `//`).
 - **Vì sao phải `permit` FORWARD?** Spring Security 6 kiểm tra cả việc controller chuyển tiếp nội bộ tới file JSP; nếu không cho qua thì mọi trang bị chặn.
+- **Vì sao tắt `sessionManagement`?** Khi bật, Spring coi mỗi request có JWT là "vừa đăng nhập" nên đổi CSRF token ở mọi request (kể cả tải CSS); token trong form Đăng xuất thành cũ → bị 403. Tắt đi (kèm `NullRequestCache`, `RequestAttributeSecurityContextRepository`) thì token ổn định và không tạo `JSESSIONID`.

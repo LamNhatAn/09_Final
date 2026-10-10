@@ -36,7 +36,12 @@ public class SecurityConfig {
                                            AppUserDetailsService userDetailsService,
                                            AuthCookieService cookieService) throws Exception {
         http
-            .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            // Khong dung session. Tat SessionManagementFilter: neu bat, Spring coi MOI request co JWT la
+            // "vua dang nhap" va DOI CSRF token -> token trong form (nut Dang xuat) bi cu -> 403
+            .requestCache(rc -> rc.requestCache(new org.springframework.security.web.savedrequest.NullRequestCache()))
+            .sessionManagement(AbstractHttpConfigurer::disable)
+            .securityContext(sc -> sc.securityContextRepository(
+                    new org.springframework.security.web.context.RequestAttributeSecurityContextRepository()))
             .formLogin(AbstractHttpConfigurer::disable)
             .httpBasic(AbstractHttpConfigurer::disable)
             // CSRF token nam trong cookie XSRF-TOKEN (khong can session); form JSP gui kem _csrf
