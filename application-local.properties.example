@@ -7,8 +7,10 @@ DB_NAME=utetra
 DB_USERNAME=utetra_app
 DB_PASSWORD=DOI_MAT_KHAU_CUA_BAN
 
+# Khoa ky JWT: chuoi ngau nhien >= 32 ky tu. Moi may tu dat, khong dung chung voi nguoi khac.
+JWT_SECRET=DOI_THANH_CHUOI_NGAU_NHIEN_DAI_IT_NHAT_32_KY_TU
+
 # Cac muc duoi day dung o cac ngay sau
-# jwt.secret=
 # cloudinary.cloud-name=
 # cloudinary.api-key=
 # cloudinary.api-secret=

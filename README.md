@@ -30,7 +30,7 @@ Thanh toán: COD và VNPay (sandbox). Thông báo realtime và chat bằng WebSo
    ALTER ROLE db_owner ADD MEMBER utetra_app;
    ```
 
-3. **Tạo file cấu hình bí mật:** sao chép `application-local.properties.example` thành `application-local.properties` (cùng thư mục gốc) và điền mật khẩu. File này đã nằm trong `.gitignore`, **không commit**.
+3. **Tạo file cấu hình bí mật:** sao chép `application-local.properties.example` thành `application-local.properties` (cùng thư mục gốc), điền mật khẩu DB và đặt `JWT_SECRET` là một chuỗi ngẫu nhiên dài ít nhất 32 ký tự (thiếu thì ứng dụng không khởi động). File này đã nằm trong `.gitignore`, **không commit**.
 
 ## Chạy ứng dụng
 
@@ -51,10 +51,14 @@ Chạy lệnh ở thư mục gốc dự án để ứng dụng đọc được `
 
 | URL | Kết quả mong đợi |
 |---|---|
-| http://localhost:8080/ | Trang chủ (layout khách), hiện số chi nhánh 3, danh mục 4, sản phẩm 12, người dùng 5 |
-| http://localhost:8080/staff/dashboard | Trang tạm, layout nhân viên (thanh điều hướng xanh) |
-| http://localhost:8080/admin/dashboard | Trang tạm, layout quản trị (thanh bên tối) |
+| http://localhost:8080/ | Trang chủ (layout khách), hiện số chi nhánh 3, danh mục 4, sản phẩm 12, người dùng 5; thanh menu có Đăng nhập / Đăng ký |
+| http://localhost:8080/login | Form đăng nhập |
+| http://localhost:8080/register | Form đăng ký |
+| http://localhost:8080/admin/dashboard | Chưa đăng nhập: chuyển về `/login`. USER/STAFF: trang 403. ADMIN: trang quản trị |
+| http://localhost:8080/staff/dashboard | Chưa đăng nhập: chuyển về `/login`. USER: trang 403. STAFF/ADMIN: trang nhân viên |
 | http://localhost:8080/health | JSON `{"status":"UP","database":"utetra",...}` |
+
+Các bước kiểm tra đăng nhập/phân quyền từng bước: xem [docs/03-auth.md](docs/03-auth.md).
 
 ## Tài khoản mẫu (mật khẩu chung: `Utetra@123`)
 
@@ -66,7 +70,7 @@ Chạy lệnh ở thư mục gốc dự án để ứng dụng đọc được `
 | user1@utetra.vn | USER | |
 | user2@utetra.vn | USER | |
 
-Chức năng đăng nhập sẽ làm ở Day 3.
+Đăng nhập tại `/login`. Tài khoản đăng ký mới luôn có vai trò USER; STAFF và ADMIN do quản trị tạo (Day 10).
 
 ## Cấu trúc thư mục
 
@@ -79,13 +83,16 @@ UTETra/
 └── src/main/
     ├── java/com/utetra/
     │   ├── config/        SecurityConfig, SiteMeshConfig
+    │   ├── security/      JwtService, JwtAuthenticationFilter, AuthCookieService, AppUserDetails(+Service)
+    │   ├── dto/           LoginForm, RegisterForm
+    │   ├── service/       AuthService
     │   ├── entity/        16 entity + enums/
     │   ├── repository/    16 repository
-    │   └── controller/    web/ admin/ staff/
+    │   └── controller/    web/ (Home, Health, Auth, ErrorPage) admin/ staff/
     ├── resources/         application.properties, static/css
     └── webapp/WEB-INF/
         ├── decorators/    main.jsp, staff.jsp, admin.jsp (SiteMesh)
-        └── views/         home.jsp, admin/, staff/
+        └── views/         home.jsp, auth/, error/, admin/, staff/
 ```
 
 Xem thiết kế chi tiết tại [docs/01-analysis-design.md](docs/01-analysis-design.md).

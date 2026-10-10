@@ -1,4 +1,4 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8" session="false" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <!DOCTYPE html>
 <html lang="vi">
@@ -25,9 +25,35 @@
                 <li class="nav-item"><a class="nav-link disabled" href="#">Thực đơn</a></li>
                 <li class="nav-item"><a class="nav-link disabled" href="#">Chi nhánh</a></li>
             </ul>
-            <ul class="navbar-nav">
+            <ul class="navbar-nav align-items-lg-center">
                 <li class="nav-item"><a class="nav-link disabled" href="#">Giỏ hàng</a></li>
-                <li class="nav-item"><a class="nav-link disabled" href="#">Đăng nhập</a></li>
+                <c:choose>
+                    <c:when test="${not empty currentUser}">
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                👤 <c:out value="${currentUser.fullName}"/>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <c:if test="${currentUser.admin}">
+                                    <li><a class="dropdown-item" href="<c:url value='/admin/dashboard'/>">Trang quản trị</a></li>
+                                </c:if>
+                                <c:if test="${currentUser.staff}">
+                                    <li><a class="dropdown-item" href="<c:url value='/staff/dashboard'/>">Trang nhân viên</a></li>
+                                </c:if>
+                                <li>
+                                    <form method="post" action="<c:url value='/logout'/>" class="m-0">
+                                        <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}">
+                                        <button type="submit" class="dropdown-item">Đăng xuất</button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </li>
+                    </c:when>
+                    <c:otherwise>
+                        <li class="nav-item"><a class="nav-link" href="<c:url value='/login'/>">Đăng nhập</a></li>
+                        <li class="nav-item ms-lg-2"><a class="btn btn-warning btn-sm" href="<c:url value='/register'/>">Đăng ký</a></li>
+                    </c:otherwise>
+                </c:choose>
             </ul>
         </div>
     </div>

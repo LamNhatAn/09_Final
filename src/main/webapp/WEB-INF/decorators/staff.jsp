@@ -1,4 +1,4 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8" session="false" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <!DOCTYPE html>
 <html lang="vi">
@@ -22,6 +22,11 @@
             <li class="nav-item"><a class="nav-link disabled" href="#">Chat với khách</a></li>
         </ul>
         <a class="nav-link text-white-50" href="<c:url value='/'/>">Về trang web</a>
+        <span class="navbar-text text-white mx-3">👤 <c:out value="${currentUser.fullName}"/></span>
+        <form method="post" action="<c:url value='/logout'/>" class="m-0">
+            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}">
+            <button type="submit" class="btn btn-outline-light btn-sm">Đăng xuất</button>
+        </form>
     </div>
 </nav>
 
