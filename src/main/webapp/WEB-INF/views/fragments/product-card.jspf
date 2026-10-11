@@ -1,0 +1,29 @@
+<%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" session="false" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
+<%-- Dung bang <%@ include %> ben trong c:forEach var="p" (cung page scope nen thay duoc bien p) --%>
+<fmt:setLocale value="vi_VN"/>
+<div class="col">
+    <div class="card h-100 shadow-sm product-card">
+        <a href="<c:url value='/products/${p.id}'/>" class="text-decoration-none">
+            <c:choose>
+                <c:when test="${not empty p.imageUrl}">
+                    <img src="<c:out value='${p.imageUrl}'/>" class="card-img-top product-img"
+                         alt="<c:out value='${p.name}'/>" loading="lazy">
+                </c:when>
+                <c:otherwise>
+                    <div class="product-img product-img-placeholder">🧋</div>
+                </c:otherwise>
+            </c:choose>
+        </a>
+        <div class="card-body d-flex flex-column">
+            <span class="badge text-bg-warning align-self-start mb-2"><c:out value="${p.category.name}"/></span>
+            <h3 class="h6 card-title">
+                <a class="text-reset text-decoration-none" href="<c:url value='/products/${p.id}'/>"><c:out value="${p.name}"/></a>
+            </h3>
+            <div class="mt-auto fw-bold product-price">
+                <fmt:formatNumber value="${p.basePrice}" type="number" groupingUsed="true"/> đ
+            </div>
+        </div>
+    </div>
+</div>

@@ -22,8 +22,8 @@
         <div class="collapse navbar-collapse" id="mainNav">
             <ul class="navbar-nav me-auto">
                 <li class="nav-item"><a class="nav-link" href="<c:url value='/'/>">Trang chủ</a></li>
-                <li class="nav-item"><a class="nav-link disabled" href="#">Thực đơn</a></li>
-                <li class="nav-item"><a class="nav-link disabled" href="#">Chi nhánh</a></li>
+                <li class="nav-item"><a class="nav-link" href="<c:url value='/menu'/>">Thực đơn</a></li>
+                <li class="nav-item"><a class="nav-link" href="<c:url value='/branches'/>">Chi nhánh</a></li>
             </ul>
             <ul class="navbar-nav align-items-lg-center">
                 <li class="nav-item"><a class="nav-link disabled" href="#">Giỏ hàng</a></li>
