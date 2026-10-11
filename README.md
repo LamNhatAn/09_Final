@@ -51,14 +51,20 @@ Chạy lệnh ở thư mục gốc dự án để ứng dụng đọc được `
 
 | URL | Kết quả mong đợi |
 |---|---|
-| http://localhost:8080/ | Trang chủ (layout khách), hiện số chi nhánh 3, danh mục 4, sản phẩm 12, người dùng 5; thanh menu có Đăng nhập / Đăng ký |
+| http://localhost:8080/ | Trang chủ: ô tìm kiếm, danh mục, 8 đồ uống mới nhất, 3 chi nhánh |
+| http://localhost:8080/menu | Thực đơn 12 đồ uống, 8 sản phẩm/trang, có phân trang (trang 2 có 4 sản phẩm) |
+| http://localhost:8080/menu?category=3 | Chỉ 3 món cà phê |
+| http://localhost:8080/menu?q=tra sua | Tìm không dấu: ra 4 món trà sữa |
+| http://localhost:8080/products/1 | Chi tiết Trà sữa trân châu đen: giá 35.000 đ, size S/M/L, 6 topping, món cùng loại |
+| http://localhost:8080/products/999 | Trang 404 có thanh menu |
+| http://localhost:8080/branches | 3 chi nhánh, giờ mở cửa, nhãn Đang mở/Đã đóng, link bản đồ |
 | http://localhost:8080/login | Form đăng nhập |
 | http://localhost:8080/register | Form đăng ký |
 | http://localhost:8080/admin/dashboard | Chưa đăng nhập: chuyển về `/login`. USER/STAFF: trang 403. ADMIN: trang quản trị |
 | http://localhost:8080/staff/dashboard | Chưa đăng nhập: chuyển về `/login`. USER: trang 403. STAFF/ADMIN: trang nhân viên |
 | http://localhost:8080/health | JSON `{"status":"UP","database":"utetra",...}` |
 
-Các bước kiểm tra đăng nhập/phân quyền từng bước: xem [docs/03-auth.md](docs/03-auth.md).
+Các bước kiểm tra đăng nhập/phân quyền từng bước: xem [docs/03-auth.md](docs/03-auth.md). Trang thực đơn: xem [docs/04-catalog.md](docs/04-catalog.md).
 
 ## Tài khoản mẫu (mật khẩu chung: `Utetra@123`)
 
@@ -82,17 +88,17 @@ UTETra/
 ├── docs/                                  (thiết kế, nhật ký prompt)
 └── src/main/
     ├── java/com/utetra/
-    │   ├── config/        SecurityConfig, SiteMeshConfig
+    │   ├── config/        SecurityConfig, SiteMeshConfig, LocaleConfig
     │   ├── security/      JwtService, JwtAuthenticationFilter, AuthCookieService, AppUserDetails(+Service)
-    │   ├── dto/           LoginForm, RegisterForm
-    │   ├── service/       AuthService
+    │   ├── dto/           LoginForm, RegisterForm, BranchInfo
+    │   ├── service/       AuthService, CatalogService
     │   ├── entity/        16 entity + enums/
     │   ├── repository/    16 repository
-    │   └── controller/    web/ (Home, Health, Auth, ErrorPage) admin/ staff/
+    │   └── controller/    web/ (Home, Menu, Product, Branch, Health, Auth, ErrorPage) admin/ staff/
     ├── resources/         application.properties, static/css
     └── webapp/WEB-INF/
         ├── decorators/    main.jsp, staff.jsp, admin.jsp (SiteMesh)
-        └── views/         home.jsp, auth/, error/, admin/, staff/
+        └── views/         home.jsp, menu.jsp, product-detail.jsp, branches.jsp, fragments/, auth/, error/, admin/, staff/
 ```
 
 Xem thiết kế chi tiết tại [docs/01-analysis-design.md](docs/01-analysis-design.md).

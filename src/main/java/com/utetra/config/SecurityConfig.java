@@ -53,6 +53,8 @@ public class SecurityConfig {
                 .dispatcherTypeMatchers(DispatcherType.FORWARD, DispatcherType.INCLUDE, DispatcherType.ERROR).permitAll()
                 .requestMatchers("/css/**", "/js/**", "/images/**", "/webjars/**", "/favicon.ico").permitAll()
                 .requestMatchers("/", "/login", "/register", "/403", "/error", "/health").permitAll()
+                // Trang khach xem tu do (thuc don, chi tiet san pham, chi nhanh)
+                .requestMatchers(HttpMethod.GET, "/menu", "/products/**", "/branches").permitAll()
                 .requestMatchers("/admin/**").hasRole("ADMIN")
                 .requestMatchers("/staff/**").hasAnyRole("STAFF", "ADMIN")
                 .requestMatchers("/cart/**", "/checkout/**", "/orders/**").hasRole("USER")

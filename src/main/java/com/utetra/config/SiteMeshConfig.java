@@ -17,7 +17,8 @@ public class SiteMeshConfig {
         @Override
         protected void applyCustomConfiguration(SiteMeshFilterBuilder builder) {
             // SiteMesh tu them tien to /WEB-INF/decorators/ nen o day chi ghi ten file (khong co dau / o dau)
-            builder.addDecoratorPath("/admin/*", "admin.jsp")
+            builder.setIncludeErrorPages(true) // trang loi (403, 404) cung duoc boc layout
+                   .addDecoratorPath("/admin/*", "admin.jsp")
                    .addDecoratorPath("/staff/*", "staff.jsp")
                    .addDecoratorPath("/*", "main.jsp")
                    .addExcludedPath("/webjars/*")
@@ -32,6 +33,9 @@ public class SiteMeshConfig {
         FilterRegistrationBean<UtetraSiteMeshFilter> registration =
                 new FilterRegistrationBean<>(new UtetraSiteMeshFilter());
         registration.addUrlPatterns("/*");
+        // ERROR: de trang loi (vd 404) cung duoc boc layout
+        registration.setDispatcherTypes(java.util.EnumSet.of(
+                jakarta.servlet.DispatcherType.REQUEST, jakarta.servlet.DispatcherType.ERROR));
         return registration;
     }
 }

@@ -1,30 +1,23 @@
 package com.utetra.controller.web;
 
-import com.utetra.repository.BranchRepository;
-import com.utetra.repository.CategoryRepository;
-import com.utetra.repository.ProductRepository;
-import com.utetra.repository.UserRepository;
+import com.utetra.service.CatalogService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
-/** Trang chu tam thoi cua Day 2: chung minh JSP + SiteMesh + JPA/SQL Server hoat dong. Day 4 se lam trang chu that. */
+/** Trang chu: san pham moi nhat, danh muc va chi nhanh. */
 @Controller
 @RequiredArgsConstructor
 public class HomeController {
 
-    private final BranchRepository branchRepository;
-    private final CategoryRepository categoryRepository;
-    private final ProductRepository productRepository;
-    private final UserRepository userRepository;
+    private final CatalogService catalogService;
 
     @GetMapping("/")
     public String home(Model model) {
-        model.addAttribute("branchCount", branchRepository.count());
-        model.addAttribute("categoryCount", categoryRepository.count());
-        model.addAttribute("productCount", productRepository.count());
-        model.addAttribute("userCount", userRepository.count());
+        model.addAttribute("featured", catalogService.latestProducts(8));
+        model.addAttribute("categories", catalogService.activeCategories());
+        model.addAttribute("branches", catalogService.activeBranches());
         return "home";
     }
 }
