@@ -19,7 +19,8 @@
         </a>
         <ul class="nav flex-column gap-1">
             <li class="nav-item"><a class="nav-link text-white" href="<c:url value='/admin/dashboard'/>">Tổng quan</a></li>
-            <li class="nav-item"><a class="nav-link text-white-50 disabled" href="#">Danh mục / Sản phẩm</a></li>
+            <li class="nav-item"><a class="nav-link text-white" href="<c:url value='/admin/products'/>">Sản phẩm</a></li>
+            <li class="nav-item"><a class="nav-link text-white-50 disabled" href="#">Danh mục / Topping</a></li>
             <li class="nav-item"><a class="nav-link text-white-50 disabled" href="#">Đơn hàng</a></li>
             <li class="nav-item"><a class="nav-link text-white-50 disabled" href="#">Chi nhánh</a></li>
             <li class="nav-item"><a class="nav-link text-white-50 disabled" href="#">Người dùng / Nhân viên</a></li>

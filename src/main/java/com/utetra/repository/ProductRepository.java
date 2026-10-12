@@ -56,4 +56,19 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findRelated(@Param("categoryId") Long categoryId,
                               @Param("excludeId") Long excludeId,
                               Pageable pageable);
+
+    /** Danh sach cho admin: gom ca san pham dang ngung ban / danh muc dang an. */
+    @Query(value = """
+            select p from Product p join fetch p.category c
+            where (:categoryId = 0L or c.id = :categoryId)
+              and cast(sql('case when ? collate Latin1_General_100_CI_AI like ? escape ''!'' then 1 else 0 end', p.name, :pattern) as Integer) = 1
+            """,
+            countQuery = """
+            select count(p) from Product p join p.category c
+            where (:categoryId = 0L or c.id = :categoryId)
+              and cast(sql('case when ? collate Latin1_General_100_CI_AI like ? escape ''!'' then 1 else 0 end', p.name, :pattern) as Integer) = 1
+            """)
+    Page<Product> adminSearch(@Param("categoryId") long categoryId,
+                              @Param("pattern") String pattern,
+                              Pageable pageable);
 }

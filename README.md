@@ -32,6 +32,16 @@ Thanh toán: COD và VNPay (sandbox). Thông báo realtime và chat bằng WebSo
 
 3. **Tạo file cấu hình bí mật:** sao chép `application-local.properties.example` thành `application-local.properties` (cùng thư mục gốc), điền mật khẩu DB và đặt `JWT_SECRET` là một chuỗi ngẫu nhiên dài ít nhất 32 ký tự (thiếu thì ứng dụng không khởi động). File này đã nằm trong `.gitignore`, **không commit**.
 
+4. **Cloudinary (lưu ảnh sản phẩm):** đăng nhập https://console.cloudinary.com, vào **Dashboard → API Keys**, rồi điền 3 giá trị vào `application-local.properties`:
+
+   ```properties
+   cloudinary.cloud-name=TEN_CLOUD_CUA_BAN
+   cloudinary.api-key=API_KEY
+   cloudinary.api-secret=API_SECRET
+   ```
+
+   Mỗi thành viên tự điền trên máy mình, **không gửi `api-secret` cho ai và không commit**. Nếu để trống, web vẫn chạy bình thường, chỉ không upload được ảnh (form sản phẩm sẽ báo "Chưa cấu hình Cloudinary").
+
 ## Chạy ứng dụng
 
 ```powershell
