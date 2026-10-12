@@ -71,4 +71,10 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     Page<Product> adminSearch(@Param("categoryId") long categoryId,
                               @Param("pattern") String pattern,
                               Pageable pageable);
+
+    boolean existsByCategoryId(Long categoryId);
+
+    /** Moi dong la [categoryId, so san pham]; dung cho cot "So san pham" o trang quan ly danh muc. */
+    @Query("select p.category.id, count(p) from Product p group by p.category.id")
+    List<Object[]> countByCategory();
 }

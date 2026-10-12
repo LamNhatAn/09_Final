@@ -71,10 +71,13 @@ Chạy lệnh ở thư mục gốc dự án để ứng dụng đọc được `
 | http://localhost:8080/login | Form đăng nhập |
 | http://localhost:8080/register | Form đăng ký |
 | http://localhost:8080/admin/dashboard | Chưa đăng nhập: chuyển về `/login`. USER/STAFF: trang 403. ADMIN: trang quản trị |
+| http://localhost:8080/admin/products | ADMIN: danh sách 12 sản phẩm, thêm/sửa/ẩn/xóa, upload ảnh Cloudinary |
+| http://localhost:8080/admin/categories | ADMIN: 4 danh mục kèm số sản phẩm, thêm/sửa/ẩn/xóa |
+| http://localhost:8080/admin/toppings | ADMIN: 6 topping, thêm/sửa/ẩn/xóa |
 | http://localhost:8080/staff/dashboard | Chưa đăng nhập: chuyển về `/login`. USER: trang 403. STAFF/ADMIN: trang nhân viên |
 | http://localhost:8080/health | JSON `{"status":"UP","database":"utetra",...}` |
 
-Các bước kiểm tra đăng nhập/phân quyền từng bước: xem [docs/03-auth.md](docs/03-auth.md). Trang thực đơn: xem [docs/04-catalog.md](docs/04-catalog.md).
+Các bước kiểm tra đăng nhập/phân quyền từng bước: xem [docs/03-auth.md](docs/03-auth.md). Trang thực đơn: xem [docs/04-catalog.md](docs/04-catalog.md). Quản trị sản phẩm, danh mục, topping, upload ảnh: xem [docs/05-admin-catalog.md](docs/05-admin-catalog.md).
 
 ## Tài khoản mẫu (mật khẩu chung: `Utetra@123`)
 
@@ -100,15 +103,15 @@ UTETra/
     ├── java/com/utetra/
     │   ├── config/        SecurityConfig, SiteMeshConfig, LocaleConfig
     │   ├── security/      JwtService, JwtAuthenticationFilter, AuthCookieService, AppUserDetails(+Service)
-    │   ├── dto/           LoginForm, RegisterForm, BranchInfo
-    │   ├── service/       AuthService, CatalogService
+    │   ├── dto/           LoginForm, RegisterForm, BranchInfo, ProductForm, CategoryForm, ToppingForm
+    │   ├── service/       AuthService, CatalogService, ImageStorageService, AdminProduct/Category/ToppingService
     │   ├── entity/        16 entity + enums/
     │   ├── repository/    16 repository
-    │   └── controller/    web/ (Home, Menu, Product, Branch, Health, Auth, ErrorPage) admin/ staff/
-    ├── resources/         application.properties, static/css
+    │   └── controller/    web/ (Home, Menu, Product, Branch, Health, Auth, ErrorPage) admin/ (Product, Category, Topping, NoticeAdvice) staff/
+    ├── resources/         application.properties, messages.properties, static/css
     └── webapp/WEB-INF/
         ├── decorators/    main.jsp, staff.jsp, admin.jsp (SiteMesh)
-        └── views/         home.jsp, menu.jsp, product-detail.jsp, branches.jsp, fragments/, auth/, error/, admin/, staff/
+        └── views/         home.jsp, menu.jsp, product-detail.jsp, branches.jsp, fragments/, auth/, error/, admin/ (products/, categories/, toppings/), staff/
 ```
 
 Xem thiết kế chi tiết tại [docs/01-analysis-design.md](docs/01-analysis-design.md).

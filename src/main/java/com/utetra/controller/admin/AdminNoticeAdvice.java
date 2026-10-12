@@ -18,8 +18,8 @@ public class AdminNoticeAdvice {
             "created", "Đã thêm thành công.",
             "updated", "Đã cập nhật thành công.",
             "deleted", "Đã xóa thành công.",
-            "shown", "Đã chuyển sang trạng thái đang bán.",
-            "hidden", "Đã ẩn (ngừng bán).");
+            "shown", "Đã bật hiển thị.",
+            "hidden", "Đã ẩn.");
 
     private static final Map<String, String> ERR = Map.of(
             "in_use", "Không thể xóa vì dữ liệu đang được sử dụng. Hãy dùng nút Ẩn thay cho Xóa.",
