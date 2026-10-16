@@ -46,6 +46,8 @@ public class AppUserDetails implements UserDetails {
 
     public boolean isStaff() { return role == Role.STAFF; }
 
+    public boolean isCustomer() { return role == Role.USER; }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));

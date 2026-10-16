@@ -51,7 +51,13 @@ public class AdminCategoryController {
             model.addAttribute("category", null);
             return "admin/categories/form";
         }
-        categoryService.create(form);
+        try {
+            categoryService.create(form);
+        } catch (DataIntegrityViolationException e) {
+            result.rejectValue("name", "name.duplicate", "Tên danh mục này đã tồn tại");
+            model.addAttribute("category", null);
+            return "admin/categories/form";
+        }
         redirect.addAttribute("ok", "created");
         return LIST_REDIRECT;
     }
@@ -77,7 +83,13 @@ public class AdminCategoryController {
             model.addAttribute("category", category);
             return "admin/categories/form";
         }
-        categoryService.update(category, form);
+        try {
+            categoryService.update(category, form);
+        } catch (DataIntegrityViolationException e) {
+            result.rejectValue("name", "name.duplicate", "Tên danh mục này đã tồn tại");
+            model.addAttribute("category", category);
+            return "admin/categories/form";
+        }
         redirect.addAttribute("ok", "updated");
         return LIST_REDIRECT;
     }

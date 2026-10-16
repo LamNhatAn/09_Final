@@ -34,8 +34,16 @@ public class AdminProductService {
     private final ImageStorageService imageStorage;
 
     public Page<Product> search(long categoryId, String keyword, int page) {
-        return productRepository.adminSearch(categoryId, CatalogService.likePattern(keyword),
-                PageRequest.of(Math.max(page, 1) - 1, PAGE_SIZE, Sort.by("id").descending()));
+        String pattern = CatalogService.likePattern(keyword);
+        Sort sort = Sort.by("id").descending();
+        PageRequest pageable = PageRequest.of(Math.max(page, 1) - 1, PAGE_SIZE, sort);
+        Page<Product> result = productRepository.adminSearch(categoryId, pattern, pageable);
+        if (result.isEmpty() && result.getTotalPages() > 0
+                && pageable.getPageNumber() >= result.getTotalPages()) {
+            result = productRepository.adminSearch(categoryId, pattern,
+                    PageRequest.of(result.getTotalPages() - 1, PAGE_SIZE, sort));
+        }
+        return result;
     }
 
     public Optional<Product> find(Long id) {

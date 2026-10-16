@@ -26,7 +26,9 @@
                 <li class="nav-item"><a class="nav-link" href="<c:url value='/branches'/>">Chi nhánh</a></li>
             </ul>
             <ul class="navbar-nav align-items-lg-center">
-                <li class="nav-item"><a class="nav-link disabled" href="#">Giỏ hàng</a></li>
+                <c:if test="${empty currentUser or currentUser.customer}">
+                    <li class="nav-item"><a class="nav-link" href="<c:url value='/cart'/>">🛒 Giỏ hàng</a></li>
+                </c:if>
                 <c:choose>
                     <c:when test="${not empty currentUser}">
                         <li class="nav-item dropdown">
