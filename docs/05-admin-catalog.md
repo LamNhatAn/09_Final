@@ -19,6 +19,14 @@ Quy tắc dữ liệu:
 | Danh mục | tên bắt buộc ≤ 100 ký tự, **không trùng tên** | chưa có sản phẩm nào |
 | Topping | tên bắt buộc ≤ 100 ký tự, **không trùng tên**, giá nguyên ≥ 0 | không nằm trong giỏ hàng nào |
 
+Tên danh mục và topping được kiểm tra ở cả ứng dụng lẫn `UNIQUE constraint` trong SQL Server để vẫn chặn được hai request tạo trùng tên cùng lúc. Với database đã tạo trước bản sửa này, chạy một lần:
+
+```powershell
+sqlcmd -S localhost -E -C -f 65001 -i database\day5-add-unique-names.sql
+```
+
+Script không xóa dữ liệu. Nếu dữ liệu hiện tại đã có tên trùng, script sẽ dừng và yêu cầu xử lý bản ghi trùng trước.
+
 - Không xóa được thì hiện thông báo và gợi ý dùng nút **Ẩn**. Ẩn danh mục sẽ ẩn luôn sản phẩm của nó trên trang khách.
 - Đơn hàng đã đặt lưu **bản sao** tên và giá (không khóa ngoại), nên xóa sản phẩm hay topping không làm hỏng đơn cũ.
 - Sau mỗi thao tác, trang quay lại danh sách kèm `?ok=...` hoặc `?err=...`; `AdminNoticeAdvice` đổi mã đó thành câu cố định (không in thẳng tham số URL nên không chèn nội dung giả vào trang, và không cần session).
@@ -107,7 +115,7 @@ flowchart TD
 7. **Ảnh sai:** chọn file `.txt` đổi tên thành `.png` thì báo "Chỉ chấp nhận ảnh JPG, PNG hoặc WEBP"; chọn ảnh lớn hơn 2 MB thì trình duyệt báo ngay.
 8. Đăng nhập `user1@utetra.vn` rồi mở `/admin/products`: bị chuyển tới trang 403.
 
-Chạy test: `mvnw.cmd test` (37 test; thêm 26 test: 6 kiểm tra ảnh, 10 sản phẩm, 10 danh mục và topping).
+Chạy test: `mvnw.cmd test` (38 test; Day 5 thêm 27 test: 6 kiểm tra ảnh, 11 sản phẩm, 10 danh mục và topping).
 
 ## 8. Giải thích để trả lời khi bị hỏi
 

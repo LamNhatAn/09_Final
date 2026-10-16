@@ -50,7 +50,13 @@ public class AdminToppingController {
             model.addAttribute("topping", null);
             return "admin/toppings/form";
         }
-        toppingService.create(form);
+        try {
+            toppingService.create(form);
+        } catch (DataIntegrityViolationException e) {
+            result.rejectValue("name", "name.duplicate", "Tên topping này đã tồn tại");
+            model.addAttribute("topping", null);
+            return "admin/toppings/form";
+        }
         redirect.addAttribute("ok", "created");
         return LIST_REDIRECT;
     }
@@ -76,7 +82,13 @@ public class AdminToppingController {
             model.addAttribute("topping", topping);
             return "admin/toppings/form";
         }
-        toppingService.update(topping, form);
+        try {
+            toppingService.update(topping, form);
+        } catch (DataIntegrityViolationException e) {
+            result.rejectValue("name", "name.duplicate", "Tên topping này đã tồn tại");
+            model.addAttribute("topping", topping);
+            return "admin/toppings/form";
+        }
         redirect.addAttribute("ok", "updated");
         return LIST_REDIRECT;
     }

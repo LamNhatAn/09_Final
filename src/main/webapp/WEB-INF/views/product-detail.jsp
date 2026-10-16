@@ -65,10 +65,94 @@
             </ul>
         </c:if>
 
-        <div class="mt-4">
-            <button type="button" class="btn btn-utetra btn-lg" disabled>Thêm vào giỏ hàng</button>
-            <div class="form-text">Chức năng đặt hàng sẽ được mở ở bước tiếp theo.</div>
-        </div>
+        <c:if test="${not empty cartErrorMessage}">
+            <div class="alert alert-danger mt-3"><c:out value="${cartErrorMessage}"/></div>
+        </c:if>
+
+        <c:choose>
+            <c:when test="${not empty currentUser and currentUser.customer}">
+                <form method="post" action="<c:url value='/cart/items'/>" class="mt-4 border rounded-3 bg-white p-3">
+                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}">
+                    <input type="hidden" name="productId" value="${product.id}">
+
+                    <fieldset class="mb-3">
+                        <legend class="h6">Chọn kích cỡ</legend>
+                        <div class="d-flex flex-wrap gap-2">
+                            <c:forEach var="s" items="${sizes}" varStatus="loop">
+                                <div>
+                                    <input class="btn-check" type="radio" name="sizeId" id="size-${s.id}"
+                                           value="${s.id}" ${loop.first ? 'checked' : ''} required>
+                                    <label class="btn btn-outline-secondary" for="size-${s.id}">
+                                        <c:out value="${s.name}"/>
+                                        <c:if test="${s.extraPrice.signum() > 0}">
+                                            +<fmt:formatNumber value="${s.extraPrice}" type="number"/> đ
+                                        </c:if>
+                                    </label>
+                                </div>
+                            </c:forEach>
+                        </div>
+                    </fieldset>
+
+                    <c:if test="${not empty toppings}">
+                        <fieldset class="mb-3">
+                            <legend class="h6">Chọn topping</legend>
+                            <div class="row row-cols-1 row-cols-sm-2 g-2">
+                                <c:forEach var="t" items="${toppings}">
+                                    <div class="col">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="toppingIds"
+                                                   value="${t.id}" id="topping-${t.id}">
+                                            <label class="form-check-label" for="topping-${t.id}">
+                                                <c:out value="${t.name}"/> (+<fmt:formatNumber value="${t.price}" type="number"/> đ)
+                                            </label>
+                                        </div>
+                                    </div>
+                                </c:forEach>
+                            </div>
+                        </fieldset>
+                    </c:if>
+
+                    <div class="row g-2 mb-3">
+                        <div class="col-6 col-lg-4">
+                            <label class="form-label" for="sugarPercent">Mức đường</label>
+                            <select class="form-select" id="sugarPercent" name="sugarPercent">
+                                <option value="0">0%</option><option value="30">30%</option>
+                                <option value="50">50%</option><option value="70">70%</option>
+                                <option value="100" selected>100%</option>
+                            </select>
+                        </div>
+                        <div class="col-6 col-lg-4">
+                            <label class="form-label" for="icePercent">Mức đá</label>
+                            <select class="form-select" id="icePercent" name="icePercent">
+                                <option value="0">0%</option><option value="30">30%</option>
+                                <option value="50">50%</option><option value="70">70%</option>
+                                <option value="100" selected>100%</option>
+                            </select>
+                        </div>
+                        <div class="col-12 col-lg-4">
+                            <label class="form-label" for="quantity">Số lượng</label>
+                            <input class="form-control" type="number" id="quantity" name="quantity"
+                                   value="1" min="1" max="20" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="note">Ghi chú cho món</label>
+                        <input class="form-control" id="note" name="note" maxlength="255"
+                               placeholder="Ví dụ: ít ngọt, để riêng topping...">
+                    </div>
+                    <button type="submit" class="btn btn-utetra btn-lg">Thêm vào giỏ hàng</button>
+                </form>
+            </c:when>
+            <c:when test="${empty currentUser}">
+                <div class="mt-4">
+                    <a class="btn btn-utetra btn-lg"
+                       href="<c:url value='/login'><c:param name='next' value='/products/${product.id}'/></c:url>">Đăng nhập để đặt món</a>
+                </div>
+            </c:when>
+            <c:otherwise>
+                <div class="alert alert-light border mt-4">Chỉ tài khoản khách hàng mới sử dụng giỏ hàng.</div>
+            </c:otherwise>
+        </c:choose>
     </div>
 </div>
 
