@@ -45,6 +45,9 @@ public class OrderItem {
     @Column(nullable = false)
     private int quantity = 1;
 
+    @Column(length = 255)
+    private String note;
+
     @Column(nullable = false, precision = 12, scale = 0)
     private BigDecimal lineTotal;
 

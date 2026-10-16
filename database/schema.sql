@@ -66,7 +66,8 @@ CREATE TABLE categories (
     id           BIGINT IDENTITY(1,1) PRIMARY KEY,
     name         NVARCHAR(100) NOT NULL,
     description  NVARCHAR(500) NULL,
-    active       BIT           NOT NULL DEFAULT 1
+    active       BIT           NOT NULL DEFAULT 1,
+    CONSTRAINT uq_categories_name UNIQUE (name)
 );
 
 CREATE TABLE products (
@@ -94,7 +95,8 @@ CREATE TABLE toppings (
     id         BIGINT IDENTITY(1,1) PRIMARY KEY,
     name       NVARCHAR(100) NOT NULL,
     price      DECIMAL(12,0) NOT NULL,
-    available  BIT           NOT NULL DEFAULT 1
+    available  BIT           NOT NULL DEFAULT 1,
+    CONSTRAINT uq_toppings_name UNIQUE (name)
 );
 
 /* ---------- Gio hang ---------- */
@@ -117,7 +119,9 @@ CREATE TABLE cart_items (
     CONSTRAINT fk_cart_items_cart    FOREIGN KEY (cart_id)    REFERENCES carts(id) ON DELETE CASCADE,
     CONSTRAINT fk_cart_items_product FOREIGN KEY (product_id) REFERENCES products(id),
     CONSTRAINT fk_cart_items_size    FOREIGN KEY (size_id)    REFERENCES sizes(id),
-    CONSTRAINT ck_cart_items_qty CHECK (quantity > 0)
+    CONSTRAINT ck_cart_items_qty CHECK (quantity BETWEEN 1 AND 20),
+    CONSTRAINT ck_cart_items_sugar CHECK (sugar_percent IN (0,30,50,70,100)),
+    CONSTRAINT ck_cart_items_ice CHECK (ice_percent IN (0,30,50,70,100))
 );
 CREATE INDEX ix_cart_items_cart ON cart_items(cart_id);
 
@@ -166,8 +170,13 @@ CREATE TABLE order_items (
     sugar_percent  INT           NOT NULL DEFAULT 100,
     ice_percent    INT           NOT NULL DEFAULT 100,
     quantity       INT           NOT NULL DEFAULT 1,
+    note           NVARCHAR(255) NULL,
     line_total     DECIMAL(12,0) NOT NULL,
-    CONSTRAINT fk_order_items_order FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE
+    CONSTRAINT fk_order_items_order FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
+    CONSTRAINT ck_order_items_qty CHECK (quantity BETWEEN 1 AND 20),
+    CONSTRAINT ck_order_items_sugar CHECK (sugar_percent IN (0,30,50,70,100)),
+    CONSTRAINT ck_order_items_ice CHECK (ice_percent IN (0,30,50,70,100)),
+    CONSTRAINT ck_order_items_total CHECK (unit_price >= 0 AND line_total >= 0)
 );
 CREATE INDEX ix_order_items_order ON order_items(order_id);
 

@@ -9,6 +9,8 @@ import com.utetra.repository.ProductRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.math.BigDecimal;
 
@@ -19,6 +21,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
 
 class AdminProductServiceTest {
@@ -147,5 +150,22 @@ class AdminProductServiceTest {
         p.setAvailable(true);
         assertEquals(false, service.toggleAvailable(p));
         assertEquals(true, service.toggleAvailable(p));
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void searchPastLastPageFallsBackToLastPage() {
+        Page<Product> pastLast = mock(Page.class);
+        Page<Product> lastPage = mock(Page.class);
+        when(pastLast.isEmpty()).thenReturn(true);
+        when(pastLast.getTotalPages()).thenReturn(3);
+        when(productRepository.adminSearch(any(Long.class), any(String.class), any(Pageable.class)))
+                .thenReturn(pastLast, lastPage);
+
+        Page<Product> result = service.search(0L, "", 999);
+
+        assertEquals(lastPage, result);
+        verify(productRepository, times(2))
+                .adminSearch(any(Long.class), any(String.class), any(Pageable.class));
     }
 }
