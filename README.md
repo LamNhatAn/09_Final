@@ -78,11 +78,12 @@ Chạy lệnh ở thư mục gốc dự án để ứng dụng đọc được `
 | http://localhost:8080/checkout | USER: chọn chi nhánh, nhập thông tin giao hàng và đặt đơn COD |
 | http://localhost:8080/orders | USER: danh sách đơn của mình, phân trang và sắp mới nhất trước |
 | http://localhost:8080/orders/{code} | USER: chi tiết, lịch sử trạng thái và hủy đơn còn chờ xác nhận |
-| http://localhost:8080/admin/orders | ADMIN: danh sách tất cả đơn hàng, xem chi tiết và xác nhận đơn đang chờ |
-| http://localhost:8080/staff/dashboard | Chưa đăng nhập: chuyển về `/login`. USER: trang 403. STAFF/ADMIN: trang nhân viên |
+| http://localhost:8080/admin/orders | ADMIN: lọc/tìm toàn bộ đơn, xem chi tiết và chuyển trạng thái đúng quy trình |
+| http://localhost:8080/staff/orders | STAFF: chỉ xem, lọc, tìm và xử lý đơn thuộc chi nhánh được gán |
+| http://localhost:8080/staff/dashboard | STAFF/ADMIN: chuyển tới trang xử lý đơn; USER bị từ chối quyền |
 | http://localhost:8080/health | JSON `{"status":"UP","database":"utetra",...}` |
 
-Các bước kiểm tra đăng nhập/phân quyền từng bước: xem [docs/03-auth.md](docs/03-auth.md). Trang thực đơn: xem [docs/04-catalog.md](docs/04-catalog.md). Quản trị sản phẩm, danh mục, topping, upload ảnh: xem [docs/05-admin-catalog.md](docs/05-admin-catalog.md). Giỏ hàng và đặt hàng COD: xem [docs/06-cart-checkout.md](docs/06-cart-checkout.md). Theo dõi và hủy đơn của khách: xem [docs/07-customer-orders.md](docs/07-customer-orders.md).
+Các bước kiểm tra đăng nhập/phân quyền từng bước: xem [docs/03-auth.md](docs/03-auth.md). Trang thực đơn: xem [docs/04-catalog.md](docs/04-catalog.md). Quản trị sản phẩm, danh mục, topping, upload ảnh: xem [docs/05-admin-catalog.md](docs/05-admin-catalog.md). Giỏ hàng và đặt hàng COD: xem [docs/06-cart-checkout.md](docs/06-cart-checkout.md). Theo dõi và hủy đơn của khách: xem [docs/07-customer-orders.md](docs/07-customer-orders.md). Nhân viên xử lý đơn theo chi nhánh: xem [docs/08-staff-order-workflow.md](docs/08-staff-order-workflow.md).
 
 ## Tài khoản mẫu (mật khẩu chung: `Utetra@123`)
 
@@ -91,6 +92,7 @@ Các bước kiểm tra đăng nhập/phân quyền từng bước: xem [docs/03
 | admin@utetra.vn | ADMIN | |
 | staff1@utetra.vn | STAFF | UTETra Võ Văn Ngân |
 | staff2@utetra.vn | STAFF | UTETra Quận 1 |
+| staff3@utetra.vn | STAFF | UTETra Gò Vấp |
 | user1@utetra.vn | USER | |
 | user2@utetra.vn | USER | |
 
