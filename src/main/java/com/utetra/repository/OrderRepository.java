@@ -51,4 +51,39 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select o from Order o where o.code = :code")
     Optional<Order> findByCodeForUpdate(@Param("code") String code);
+
+    @Query(value = """
+            select o from Order o
+            join fetch o.branch b
+            join fetch o.user u
+            where (:branchId = 0L or b.id = :branchId)
+              and (:status is null or o.status = :status)
+              and (o.code like :pattern escape '!' or o.receiverPhone like :pattern escape '!')
+            """,
+            countQuery = """
+            select count(o) from Order o
+            join o.branch b
+            where (:branchId = 0L or b.id = :branchId)
+              and (:status is null or o.status = :status)
+              and (o.code like :pattern escape '!' or o.receiverPhone like :pattern escape '!')
+            """)
+    Page<Order> searchManagement(@Param("branchId") long branchId,
+                                 @Param("status") com.utetra.entity.enums.OrderStatus status,
+                                 @Param("pattern") String pattern,
+                                 Pageable pageable);
+
+    @Query("""
+            select distinct o from Order o
+            join fetch o.branch
+            join fetch o.user
+            left join fetch o.items
+            where o.code = :code and o.branch.id = :branchId
+            """)
+    Optional<Order> findDetailedByCodeAndBranchId(@Param("code") String code,
+                                                  @Param("branchId") Long branchId);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("select o from Order o where o.code = :code and o.branch.id = :branchId")
+    Optional<Order> findByCodeAndBranchIdForUpdate(@Param("code") String code,
+                                                   @Param("branchId") Long branchId);
 }

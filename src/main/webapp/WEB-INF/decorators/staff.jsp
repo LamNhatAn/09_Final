@@ -18,7 +18,7 @@
             🧋 UTETra <span class="badge bg-light text-dark">Nhân viên</span>
         </a>
         <ul class="navbar-nav flex-row gap-3 me-auto ms-3">
-            <li class="nav-item"><a class="nav-link" href="<c:url value='/staff/dashboard'/>">Đơn hàng</a></li>
+            <li class="nav-item"><a class="nav-link" href="<c:url value='/staff/orders'/>">Đơn hàng</a></li>
             <li class="nav-item"><a class="nav-link disabled" href="#">Chat với khách</a></li>
         </ul>
         <a class="nav-link text-white-50" href="<c:url value='/'/>">Về trang web</a>

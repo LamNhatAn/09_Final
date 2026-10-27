@@ -7,9 +7,40 @@
 <div class="d-flex justify-content-between align-items-center mb-3">
     <div>
         <h1 class="h3 mb-1">Đơn hàng</h1>
-        <p class="text-muted mb-0">Xem và xác nhận các đơn khách đã đặt.</p>
+        <p class="text-muted mb-0">Lọc, tìm kiếm và theo dõi đơn của toàn hệ thống.</p>
     </div>
 </div>
+
+<form method="get" action="<c:url value='/admin/orders'/>" class="card card-body border-0 shadow-sm mb-3">
+    <div class="row g-2 align-items-end">
+        <div class="col-md-3">
+            <label class="form-label" for="branch">Chi nhánh</label>
+            <select class="form-select" id="branch" name="branch">
+                <option value="0">Tất cả chi nhánh</option>
+                <c:forEach var="b" items="${branches}">
+                    <option value="${b.branch.id}" ${selectedBranch == b.branch.id ? 'selected' : ''}><c:out value="${b.branch.name}"/></option>
+                </c:forEach>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label" for="status">Trạng thái</label>
+            <select class="form-select" id="status" name="status">
+                <option value="">Tất cả trạng thái</option>
+                <c:forEach var="s" items="${statuses}">
+                    <option value="${s}" ${selectedStatus == s ? 'selected' : ''}><c:out value="${s.label}"/></option>
+                </c:forEach>
+            </select>
+        </div>
+        <div class="col-md-4">
+            <label class="form-label" for="q">Mã đơn hoặc số điện thoại</label>
+            <input class="form-control" id="q" name="q" value="<c:out value='${q}'/>" maxlength="100">
+        </div>
+        <div class="col-md-2 d-flex gap-2">
+            <button class="btn btn-primary" type="submit">Lọc</button>
+            <a class="btn btn-outline-secondary" href="<c:url value='/admin/orders'/>">Xóa lọc</a>
+        </div>
+    </div>
+</form>
 
 <c:choose>
     <c:when test="${empty orders.content}">
@@ -44,7 +75,7 @@
                 <ul class="pagination justify-content-center">
                     <c:forEach begin="1" end="${orders.totalPages}" var="p">
                         <li class="page-item ${p == orders.number + 1 ? 'active' : ''}">
-                            <a class="page-link" href="<c:url value='/admin/orders'><c:param name='page' value='${p}'/></c:url>">${p}</a>
+                            <a class="page-link" href="<c:url value='/admin/orders'><c:param name='branch' value='${selectedBranch}'/><c:param name='status' value='${selectedStatus}'/><c:param name='q' value='${q}'/><c:param name='page' value='${p}'/></c:url>">${p}</a>
                         </li>
                     </c:forEach>
                 </ul>

@@ -23,13 +23,15 @@ public class AdminOrderService {
     private final OrderStatusHistoryRepository historyRepository;
 
     @Transactional(readOnly = true)
-    public Page<Order> list(int page) {
+    public Page<Order> list(Long branchId, OrderStatus status, String keyword, int page) {
         Sort sort = Sort.by(Sort.Order.desc("createdAt"), Sort.Order.desc("id"));
         PageRequest pageable = PageRequest.of(Math.max(page, 1) - 1, PAGE_SIZE, sort);
-        Page<Order> result = orderRepository.findAll(pageable);
+        long selectedBranch = branchId == null ? 0L : branchId;
+        String pattern = searchPattern(keyword);
+        Page<Order> result = orderRepository.searchManagement(selectedBranch, status, pattern, pageable);
         if (result.isEmpty() && result.getTotalPages() > 0
                 && pageable.getPageNumber() >= result.getTotalPages()) {
-            result = orderRepository.findAll(
+            result = orderRepository.searchManagement(selectedBranch, status, pattern,
                     PageRequest.of(result.getTotalPages() - 1, PAGE_SIZE, sort));
         }
         return result;
@@ -44,20 +46,32 @@ public class AdminOrderService {
     }
 
     @Transactional
-    public void confirm(Long adminId, String code) {
+    public OrderStatus advance(Long adminId, String code) {
         Order order = orderRepository.findByCodeForUpdate(code)
                 .orElseThrow(() -> new AdminOrderException("Không tìm thấy đơn hàng"));
-        if (order.getStatus() != OrderStatus.PENDING) {
-            throw new AdminOrderException("Chỉ có thể xác nhận đơn đang chờ xác nhận");
+        OrderStatus next = order.getStatus().next();
+        if (next == null) {
+            throw new AdminOrderException("Đơn hàng đã kết thúc, không thể chuyển tiếp");
         }
 
-        order.setStatus(OrderStatus.CONFIRMED);
+        order.setStatus(next);
         orderRepository.save(order);
 
         OrderStatusHistory history = new OrderStatusHistory();
         history.setOrder(order);
-        history.setStatus(OrderStatus.CONFIRMED);
+        history.setStatus(next);
         history.setChangedBy(adminId);
         historyRepository.save(history);
+        return next;
+    }
+
+    static String searchPattern(String keyword) {
+        String value = keyword == null ? "" : keyword.trim();
+        if (value.length() > 100) {
+            value = value.substring(0, 100);
+        }
+        String escaped = value.replace("!", "!!").replace("%", "!%")
+                .replace("_", "!_").replace("[", "![");
+        return "%" + escaped + "%";
     }
 }

@@ -19,10 +19,12 @@
     </div>
     <div class="d-flex align-items-center gap-2">
         <span class="badge fs-6 ${detail.order.status.badgeClass}"><c:out value="${detail.order.status.label}"/></span>
-        <c:if test="${detail.confirmable}">
-            <form method="post" action="<c:url value='/admin/orders/${detail.order.code}/confirm'/>">
+        <c:if test="${detail.advanceable}">
+            <form method="post" action="<c:url value='/admin/orders/${detail.order.code}/advance'/>">
                 <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}">
-                <button class="btn btn-success" type="submit" onclick="return confirm('Xác nhận tiếp nhận đơn hàng này?');">Xác nhận đơn</button>
+                <button class="btn btn-success" type="submit" onclick="return confirm('Chuyển đơn sang trạng thái tiếp theo?');">
+                    Chuyển sang <c:out value="${detail.nextStatus.label}"/>
+                </button>
             </form>
         </c:if>
     </div>

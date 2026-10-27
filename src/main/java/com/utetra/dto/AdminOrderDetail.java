@@ -19,4 +19,12 @@ public record AdminOrderDetail(Order order, List<OrderStatusHistory> history) {
     public boolean isConfirmable() {
         return order.getStatus() == OrderStatus.PENDING;
     }
+
+    public boolean isAdvanceable() {
+        return order.getStatus().next() != null;
+    }
+
+    public OrderStatus getNextStatus() {
+        return order.getStatus().next();
+    }
 }

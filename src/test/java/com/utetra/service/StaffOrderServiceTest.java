@@ -1,0 +1,116 @@
+package com.utetra.service;
+
+import com.utetra.dto.AdminOrderDetail;
+import com.utetra.entity.Order;
+import com.utetra.entity.OrderStatusHistory;
+import com.utetra.entity.enums.OrderStatus;
+import com.utetra.repository.OrderRepository;
+import com.utetra.repository.OrderStatusHistoryRepository;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+
+import java.util.List;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+class StaffOrderServiceTest {
+
+    private OrderRepository orderRepository;
+    private OrderStatusHistoryRepository historyRepository;
+    private StaffOrderService service;
+
+    @BeforeEach
+    void setUp() {
+        orderRepository = mock(OrderRepository.class);
+        historyRepository = mock(OrderStatusHistoryRepository.class);
+        service = new StaffOrderService(orderRepository, historyRepository);
+    }
+
+    @Test
+    void listAlwaysScopesOrdersToStaffBranch() {
+        Page<Order> expected = new PageImpl<>(List.of(order(OrderStatus.PREPARING)));
+        when(orderRepository.searchManagement(eq(3L), eq(OrderStatus.PREPARING), eq("%090%"), any(Pageable.class)))
+                .thenReturn(expected);
+
+        assertEquals(expected, service.list(3L, OrderStatus.PREPARING, "090", 1));
+        verify(orderRepository).searchManagement(eq(3L), eq(OrderStatus.PREPARING), eq("%090%"), any(Pageable.class));
+    }
+
+    @Test
+    void listRejectsStaffWithoutBranch() {
+        assertThrows(StaffOrderException.class, () -> service.list(null, null, "", 1));
+        verify(orderRepository, never()).searchManagement(any(Long.class), any(), any(), any());
+    }
+
+    @Test
+    void detailUsesCodeAndBranchTogether() {
+        Order order = order(OrderStatus.CONFIRMED);
+        OrderStatusHistory history = new OrderStatusHistory();
+        when(orderRepository.findDetailedByCodeAndBranchId("UTE-1", 3L)).thenReturn(Optional.of(order));
+        when(historyRepository.findByOrderIdOrderByChangedAtAscIdAsc(10L)).thenReturn(List.of(history));
+
+        AdminOrderDetail detail = service.detail(3L, "UTE-1");
+
+        assertEquals(order, detail.order());
+        assertEquals(List.of(history), detail.history());
+    }
+
+    @Test
+    void detailRejectsOrderOutsideStaffBranch() {
+        when(orderRepository.findDetailedByCodeAndBranchId("UTE-1", 3L)).thenReturn(Optional.empty());
+        assertThrows(StaffOrderException.class, () -> service.detail(3L, "UTE-1"));
+    }
+
+    @Test
+    void advanceUsesBranchLockAndWritesStaffHistory() {
+        Order order = order(OrderStatus.CONFIRMED);
+        when(orderRepository.findByCodeAndBranchIdForUpdate("UTE-1", 3L)).thenReturn(Optional.of(order));
+
+        assertEquals(OrderStatus.PREPARING, service.advance(88L, 3L, "UTE-1"));
+
+        assertEquals(OrderStatus.PREPARING, order.getStatus());
+        verify(orderRepository).save(order);
+        ArgumentCaptor<OrderStatusHistory> captor = ArgumentCaptor.forClass(OrderStatusHistory.class);
+        verify(historyRepository).save(captor.capture());
+        assertEquals(OrderStatus.PREPARING, captor.getValue().getStatus());
+        assertEquals(88L, captor.getValue().getChangedBy());
+    }
+
+    @Test
+    void advanceRejectsOrderOutsideStaffBranch() {
+        when(orderRepository.findByCodeAndBranchIdForUpdate("UTE-1", 3L)).thenReturn(Optional.empty());
+        assertThrows(StaffOrderException.class, () -> service.advance(88L, 3L, "UTE-1"));
+        verify(historyRepository, never()).save(any());
+    }
+
+    @Test
+    void advanceRejectsCompletedAndCancelledOrders() {
+        for (OrderStatus terminal : List.of(OrderStatus.COMPLETED, OrderStatus.CANCELLED)) {
+            Order order = order(terminal);
+            when(orderRepository.findByCodeAndBranchIdForUpdate("UTE-1", 3L)).thenReturn(Optional.of(order));
+            assertThrows(StaffOrderException.class, () -> service.advance(88L, 3L, "UTE-1"));
+        }
+        verify(orderRepository, never()).save(any());
+        verify(historyRepository, never()).save(any());
+    }
+
+    private static Order order(OrderStatus status) {
+        Order order = new Order();
+        order.setId(10L);
+        order.setCode("UTE-1");
+        order.setStatus(status);
+        return order;
+    }
+}
