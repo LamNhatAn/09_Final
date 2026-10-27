@@ -76,10 +76,13 @@ Chạy lệnh ở thư mục gốc dự án để ứng dụng đọc được `
 | http://localhost:8080/admin/toppings | ADMIN: 6 topping, thêm/sửa/ẩn/xóa |
 | http://localhost:8080/cart | USER: xem, cập nhật hoặc xóa món trong giỏ hàng |
 | http://localhost:8080/checkout | USER: chọn chi nhánh, nhập thông tin giao hàng và đặt đơn COD |
+| http://localhost:8080/orders | USER: danh sách đơn của mình, phân trang và sắp mới nhất trước |
+| http://localhost:8080/orders/{code} | USER: chi tiết, lịch sử trạng thái và hủy đơn còn chờ xác nhận |
+| http://localhost:8080/admin/orders | ADMIN: danh sách tất cả đơn hàng, xem chi tiết và xác nhận đơn đang chờ |
 | http://localhost:8080/staff/dashboard | Chưa đăng nhập: chuyển về `/login`. USER: trang 403. STAFF/ADMIN: trang nhân viên |
 | http://localhost:8080/health | JSON `{"status":"UP","database":"utetra",...}` |
 
-Các bước kiểm tra đăng nhập/phân quyền từng bước: xem [docs/03-auth.md](docs/03-auth.md). Trang thực đơn: xem [docs/04-catalog.md](docs/04-catalog.md). Quản trị sản phẩm, danh mục, topping, upload ảnh: xem [docs/05-admin-catalog.md](docs/05-admin-catalog.md). Giỏ hàng và đặt hàng COD: xem [docs/06-cart-checkout.md](docs/06-cart-checkout.md).
+Các bước kiểm tra đăng nhập/phân quyền từng bước: xem [docs/03-auth.md](docs/03-auth.md). Trang thực đơn: xem [docs/04-catalog.md](docs/04-catalog.md). Quản trị sản phẩm, danh mục, topping, upload ảnh: xem [docs/05-admin-catalog.md](docs/05-admin-catalog.md). Giỏ hàng và đặt hàng COD: xem [docs/06-cart-checkout.md](docs/06-cart-checkout.md). Theo dõi và hủy đơn của khách: xem [docs/07-customer-orders.md](docs/07-customer-orders.md).
 
 ## Tài khoản mẫu (mật khẩu chung: `Utetra@123`)
 
@@ -106,10 +109,10 @@ UTETra/
     │   ├── config/        SecurityConfig, SiteMeshConfig, LocaleConfig
     │   ├── security/      JwtService, JwtAuthenticationFilter, AuthCookieService, AppUserDetails(+Service)
     │   ├── dto/           Các form đăng nhập, quản trị, giỏ hàng, checkout và view model
-    │   ├── service/       Auth, Catalog, Admin catalog, Cart, Checkout, ImageStorage
+    │   ├── service/       Auth, Catalog, Admin catalog, Cart, Checkout, CustomerOrder, ImageStorage
     │   ├── entity/        16 entity + enums/
     │   ├── repository/    16 repository
-    │   └── controller/    web/ (Home, Menu, Product, Cart, Checkout, Branch, Auth...) admin/ staff/
+    │   └── controller/    web/ (Home, Menu, Product, Cart, Checkout, Order, Branch, Auth...) admin/ staff/
     ├── resources/         application.properties, messages.properties, static/css
     └── webapp/WEB-INF/
         ├── decorators/    main.jsp, staff.jsp, admin.jsp (SiteMesh)
