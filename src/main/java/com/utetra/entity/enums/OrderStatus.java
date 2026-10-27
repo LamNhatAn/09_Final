@@ -23,4 +23,14 @@ public enum OrderStatus {
     public String getBadgeClass() {
         return badgeClass;
     }
+
+    public OrderStatus next() {
+        return switch (this) {
+            case PENDING -> CONFIRMED;
+            case CONFIRMED -> PREPARING;
+            case PREPARING -> DELIVERING;
+            case DELIVERING -> COMPLETED;
+            case COMPLETED, CANCELLED -> null;
+        };
+    }
 }

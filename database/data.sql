@@ -17,6 +17,7 @@ INSERT INTO users (full_name, email, password_hash, phone, address, role, branch
  (N'Quản trị viên',    N'admin@utetra.vn',  N'$2a$10$on7yaqyxABStyDi.hT49hOtkp23DiMrBDnSe5/MS.pWw4Tmh.jnym', N'0900000001', N'TP.HCM', 'ADMIN', NULL),
  (N'Nhân viên Thủ Đức', N'staff1@utetra.vn', N'$2a$10$on7yaqyxABStyDi.hT49hOtkp23DiMrBDnSe5/MS.pWw4Tmh.jnym', N'0900000002', N'TP.HCM', 'STAFF', 1),
  (N'Nhân viên Quận 1',  N'staff2@utetra.vn', N'$2a$10$on7yaqyxABStyDi.hT49hOtkp23DiMrBDnSe5/MS.pWw4Tmh.jnym', N'0900000003', N'TP.HCM', 'STAFF', 2),
+ (N'Nhân viên Gò Vấp',  N'staff3@utetra.vn', N'$2a$10$on7yaqyxABStyDi.hT49hOtkp23DiMrBDnSe5/MS.pWw4Tmh.jnym', N'0900000006', N'TP.HCM', 'STAFF', 3),
  (N'Nguyễn Văn An',     N'user1@utetra.vn',  N'$2a$10$on7yaqyxABStyDi.hT49hOtkp23DiMrBDnSe5/MS.pWw4Tmh.jnym', N'0900000004', N'12 Lê Văn Việt, TP. Thủ Đức', 'USER', NULL),
  (N'Trần Thị Bình',     N'user2@utetra.vn',  N'$2a$10$on7yaqyxABStyDi.hT49hOtkp23DiMrBDnSe5/MS.pWw4Tmh.jnym', N'0900000005', N'45 Phan Văn Trị, Gò Vấp',      'USER', NULL);
 

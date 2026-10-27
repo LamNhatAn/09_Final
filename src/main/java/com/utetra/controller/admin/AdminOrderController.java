@@ -4,6 +4,8 @@ import com.utetra.dto.AdminOrderDetail;
 import com.utetra.security.AppUserDetails;
 import com.utetra.service.AdminOrderException;
 import com.utetra.service.AdminOrderService;
+import com.utetra.service.CatalogService;
+import com.utetra.entity.enums.OrderStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -25,10 +27,20 @@ public class AdminOrderController {
 
     private static final DateTimeFormatter DATE_TIME = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
     private final AdminOrderService orderService;
+    private final CatalogService catalogService;
 
     @GetMapping
-    public String list(@RequestParam(defaultValue = "1") int page, Model model) {
-        model.addAttribute("orders", orderService.list(page));
+    public String list(@RequestParam(defaultValue = "0") Long branch,
+                       @RequestParam(required = false) OrderStatus status,
+                       @RequestParam(defaultValue = "") String q,
+                       @RequestParam(defaultValue = "1") int page,
+                       Model model) {
+        model.addAttribute("orders", orderService.list(branch, status, q, page));
+        model.addAttribute("branches", catalogService.activeBranches());
+        model.addAttribute("statuses", OrderStatus.values());
+        model.addAttribute("selectedBranch", branch);
+        model.addAttribute("selectedStatus", status);
+        model.addAttribute("q", q == null ? "" : q.trim());
         model.addAttribute("dateTimeFormatter", DATE_TIME);
         return "admin/orders/list";
     }
@@ -42,23 +54,23 @@ public class AdminOrderController {
             AdminOrderDetail detail = orderService.detail(code);
             model.addAttribute("detail", detail);
             model.addAttribute("dateTimeFormatter", DATE_TIME);
-            model.addAttribute("okMessage", "confirmed".equals(ok) ? "Đã xác nhận đơn hàng." : null);
-            model.addAttribute("errMessage", "cannot-confirm".equals(err)
-                    ? "Không thể xác nhận đơn này. Chỉ đơn đang chờ xác nhận mới được xác nhận." : null);
+            model.addAttribute("okMessage", "advanced".equals(ok) ? "Đã chuyển trạng thái đơn hàng." : null);
+            model.addAttribute("errMessage", "cannot-advance".equals(err)
+                    ? "Không thể chuyển tiếp trạng thái của đơn này." : null);
             return "admin/orders/detail";
         } catch (AdminOrderException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy đơn hàng");
         }
     }
 
-    @PostMapping("/{code:[A-Za-z0-9-]+}/confirm")
-    public String confirm(@AuthenticationPrincipal AppUserDetails admin,
+    @PostMapping("/{code:[A-Za-z0-9-]+}/advance")
+    public String advance(@AuthenticationPrincipal AppUserDetails admin,
                           @PathVariable String code) {
         try {
-            orderService.confirm(admin.getId(), code);
-            return "redirect:/admin/orders/" + code + "?ok=confirmed";
+            orderService.advance(admin.getId(), code);
+            return "redirect:/admin/orders/" + code + "?ok=advanced";
         } catch (AdminOrderException e) {
-            return "redirect:/admin/orders/" + code + "?err=cannot-confirm";
+            return "redirect:/admin/orders/" + code + "?err=cannot-advance";
         }
     }
 }
