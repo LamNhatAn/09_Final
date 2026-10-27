@@ -86,3 +86,25 @@ body {
     aspect-ratio: 1 / 1;
     object-fit: cover;
 }
+
+.order-timeline {
+    border-left: 3px solid #ead7c2;
+    margin-left: .45rem;
+    padding-left: 1.25rem;
+}
+
+.order-timeline-item {
+    position: relative;
+    padding: .35rem 0 1.1rem;
+}
+
+.order-timeline-item::before {
+    position: absolute;
+    top: .65rem;
+    left: -1.68rem;
+    width: .7rem;
+    height: .7rem;
+    content: "";
+    border-radius: 50%;
+    background: var(--utetra-accent);
+}

@@ -29,8 +29,11 @@
         </div>
     </c:forEach>
     <div class="d-flex justify-content-between h5 pt-3"><span>Tổng cộng</span><strong class="product-price"><fmt:formatNumber value="${order.totalAmount}" type="number"/> đ</strong></div>
-    <div class="alert alert-warning mb-0">Đơn đang chờ chi nhánh xác nhận. Chức năng theo dõi và hủy đơn sẽ được hoàn thiện ở Day 7.</div>
+    <div class="alert alert-warning mb-0">Đơn đang chờ chi nhánh xác nhận. Bạn có thể theo dõi hoặc hủy đơn trước khi chi nhánh xác nhận.</div>
 </div></div>
-<div class="text-center mt-4"><a class="btn btn-utetra" href="<c:url value='/menu'/>">Tiếp tục xem thực đơn</a></div>
+<div class="text-center mt-4 d-flex justify-content-center gap-2">
+    <a class="btn btn-utetra" href="<c:url value='/orders/${order.code}'/>">Theo dõi đơn hàng</a>
+    <a class="btn btn-outline-secondary" href="<c:url value='/menu'/>">Tiếp tục xem thực đơn</a>
+</div>
 </body>
 </html>

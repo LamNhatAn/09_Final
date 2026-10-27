@@ -29,6 +29,9 @@
                 <c:if test="${empty currentUser or currentUser.customer}">
                     <li class="nav-item"><a class="nav-link" href="<c:url value='/cart'/>">🛒 Giỏ hàng</a></li>
                 </c:if>
+                <c:if test="${not empty currentUser and currentUser.customer}">
+                    <li class="nav-item"><a class="nav-link" href="<c:url value='/orders'/>">🧾 Đơn hàng</a></li>
+                </c:if>
                 <c:choose>
                     <c:when test="${not empty currentUser}">
                         <li class="nav-item dropdown">
