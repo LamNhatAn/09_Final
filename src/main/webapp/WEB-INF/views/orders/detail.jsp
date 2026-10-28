@@ -58,9 +58,21 @@
                 <dt>Chi nhánh</dt><dd><c:out value="${detail.order.branch.name}"/></dd>
                 <dt>Người nhận</dt><dd><c:out value="${detail.order.receiverName}"/> · <c:out value="${detail.order.receiverPhone}"/></dd>
                 <dt>Địa chỉ</dt><dd><c:out value="${detail.order.deliveryAddress}"/></dd>
-                <dt>Thanh toán</dt><dd>${detail.order.paymentMethod == 'COD' ? 'COD – khi nhận hàng' : 'VNPay'}</dd>
+                <dt>Thanh toán</dt>
+                <dd>
+                    ${detail.order.paymentMethod == 'COD' ? 'COD – khi nhận hàng' : 'VNPay'}
+                    <c:if test="${detail.order.paymentMethod == 'VNPAY'}">
+                        <br><span class="badge ${detail.order.paymentStatus.badgeClass}"><c:out value="${detail.order.paymentStatus.label}"/></span>
+                    </c:if>
+                </dd>
                 <c:if test="${not empty detail.order.note}"><dt>Ghi chú</dt><dd><c:out value="${detail.order.note}"/></dd></c:if>
             </dl>
+            <c:if test="${detail.payable}">
+                <form method="post" action="<c:url value='/payments/vnpay/${detail.order.code}/retry'/>" class="mt-3">
+                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}">
+                    <button class="btn btn-utetra w-100" type="submit">Thanh toán lại qua VNPay</button>
+                </form>
+            </c:if>
             <c:if test="${detail.cancellable}">
                 <form method="post" action="<c:url value='/orders/${detail.order.code}/cancel'/>" class="mt-3"
                       onsubmit="return confirm('Bạn chắc chắn muốn hủy đơn này?');">

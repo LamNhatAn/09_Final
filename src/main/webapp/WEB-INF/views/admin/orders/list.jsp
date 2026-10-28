@@ -60,7 +60,10 @@
                             <td class="text-nowrap"><c:out value="${order.createdAt.format(dateTimeFormatter)}"/></td>
                             <td><c:out value="${order.user.fullName}"/><br><span class="small text-muted"><c:out value="${order.user.email}"/></span></td>
                             <td><c:out value="${order.branch.name}"/></td>
-                            <td><span class="badge ${order.status.badgeClass}"><c:out value="${order.status.label}"/></span></td>
+                            <td>
+                                <span class="badge ${order.status.badgeClass}"><c:out value="${order.status.label}"/></span>
+                                <c:if test="${order.paymentMethod == 'VNPAY'}"><br><span class="badge mt-1 ${order.paymentStatus.badgeClass}"><c:out value="${order.paymentStatus.label}"/></span></c:if>
+                            </td>
                             <td class="text-end fw-semibold"><fmt:formatNumber value="${order.totalAmount}" type="number"/> đ</td>
                             <td class="text-end"><a class="btn btn-sm btn-outline-primary" href="<c:url value='/admin/orders/${order.code}'/>">Xem</a></td>
                         </tr>

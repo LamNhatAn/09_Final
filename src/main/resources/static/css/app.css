@@ -27,6 +27,16 @@ body {
     color: #f3e3d0;
 }
 
+.utetra-footer a {
+    color: #fff3df;
+    text-decoration: none;
+}
+
+.utetra-footer a:hover {
+    color: #fff;
+    text-decoration: underline;
+}
+
 .btn-utetra {
     background-color: var(--utetra-accent);
     border-color: var(--utetra-accent);
@@ -55,6 +65,36 @@ body {
 .product-card:hover {
     transform: translateY(-3px);
     box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15) !important;
+}
+
+.menu-kicker {
+    color: var(--utetra-accent);
+    letter-spacing: .1em;
+}
+
+.menu-category-card {
+    overflow: hidden;
+    color: var(--utetra-brown);
+    background: #fff;
+    transition: transform .2s ease, box-shadow .2s ease;
+}
+
+.menu-category-card:hover {
+    color: var(--utetra-brown);
+    transform: translateY(-5px);
+    box-shadow: 0 .75rem 1.5rem rgba(59, 42, 30, .18) !important;
+}
+
+.menu-category-card.is-active {
+    outline: 3px solid var(--utetra-accent);
+    outline-offset: 2px;
+}
+
+.menu-category-img {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    background: linear-gradient(135deg, #f3e3d0, #ffe9cf);
 }
 
 .product-img {
@@ -107,4 +147,33 @@ body {
     content: "";
     border-radius: 50%;
     background: var(--utetra-accent);
+}
+
+.contact-hero {
+    color: #3b2a1e;
+    background:
+        radial-gradient(circle at 85% 20%, rgba(217, 130, 43, .28), transparent 32%),
+        linear-gradient(135deg, #f3e3d0 0%, #fff8ef 65%, #ffe4c2 100%);
+}
+
+.contact-kicker {
+    color: var(--utetra-accent);
+    letter-spacing: .08em;
+}
+
+.contact-info-card {
+    background: rgba(255, 255, 255, .82);
+    box-shadow: 0 .5rem 1.5rem rgba(92, 54, 25, .12);
+}
+
+.contact-info-card a {
+    color: var(--utetra-brown);
+}
+
+.rating-options .btn-check:checked + .btn {
+    color: #3b2a1e;
+}
+
+.feedback-content {
+    white-space: pre-line;
 }

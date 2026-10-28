@@ -33,7 +33,10 @@
                             <td class="fw-semibold"><c:out value="${order.code}"/></td>
                             <td class="text-nowrap"><c:out value="${order.createdAt.format(dateTimeFormatter)}"/></td>
                             <td><c:out value="${order.branch.name}"/></td>
-                            <td><span class="badge ${order.status.badgeClass}"><c:out value="${order.status.label}"/></span></td>
+                            <td>
+                                <span class="badge ${order.status.badgeClass}"><c:out value="${order.status.label}"/></span>
+                                <c:if test="${order.paymentMethod == 'VNPAY'}"><br><span class="badge mt-1 ${order.paymentStatus.badgeClass}"><c:out value="${order.paymentStatus.label}"/></span></c:if>
+                            </td>
                             <td class="text-end fw-semibold product-price"><fmt:formatNumber value="${order.totalAmount}" type="number"/> đ</td>
                             <td class="text-end"><a class="btn btn-sm btn-outline-secondary" href="<c:url value='/orders/${order.code}'/>">Chi tiết</a></td>
                         </tr>

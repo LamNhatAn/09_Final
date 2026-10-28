@@ -3,7 +3,7 @@
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <html>
-<head><title>Đặt hàng COD</title></head>
+<head><title>Đặt hàng và thanh toán</title></head>
 <body>
 <nav aria-label="breadcrumb"><ol class="breadcrumb">
     <li class="breadcrumb-item"><a href="<c:url value='/cart'/>">Giỏ hàng</a></li>
@@ -27,6 +27,26 @@
                     </form:select>
                     <form:errors path="branchId" cssClass="invalid-feedback d-block"/>
                 </div>
+                <div class="mb-3">
+                    <label class="form-label d-block">Phương thức thanh toán</label>
+                    <div class="form-check border rounded p-3 ps-5 mb-2">
+                        <form:radiobutton path="paymentMethod" value="COD" cssClass="form-check-input"/>
+                        <label class="form-check-label" for="paymentMethod1">
+                            <strong>COD</strong> – thanh toán khi nhận hàng
+                        </label>
+                    </div>
+                    <div class="form-check border rounded p-3 ps-5">
+                        <form:radiobutton path="paymentMethod" value="VNPAY" cssClass="form-check-input"
+                                          disabled="${!vnpayConfigured}"/>
+                        <label class="form-check-label" for="paymentMethod2">
+                            <strong>VNPay</strong> – thẻ ATM, tài khoản ngân hàng hoặc VNPAY-QR
+                        </label>
+                        <c:if test="${!vnpayConfigured}">
+                            <div class="small text-danger">Máy này chưa cấu hình khóa VNPay sandbox.</div>
+                        </c:if>
+                    </div>
+                    <form:errors path="paymentMethod" cssClass="text-danger small d-block mt-1"/>
+                </div>
                 <div class="row g-3">
                     <div class="col-md-7">
                         <label class="form-label" for="receiverName">Tên người nhận</label>
@@ -49,7 +69,6 @@
                         <form:errors path="note" cssClass="invalid-feedback d-block"/>
                     </div>
                 </div>
-                <div class="alert alert-light border mt-3 mb-0">Phương thức thanh toán: <strong>COD – thanh toán khi nhận hàng</strong></div>
             </div>
             <div class="card-footer bg-white p-4 d-flex gap-2">
                 <button class="btn btn-utetra" type="submit">Xác nhận đặt hàng</button>
