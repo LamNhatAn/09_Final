@@ -6,7 +6,43 @@
     <title>Thực đơn</title>
 </head>
 <body>
-<h1 class="h3 mb-3">Thực đơn</h1>
+<div class="text-center mb-4">
+    <p class="text-uppercase small fw-semibold menu-kicker mb-1">Khám phá UTETra</p>
+    <h1 class="display-6 fw-bold mb-2">Thực đơn</h1>
+    <p class="text-muted mb-0">Chọn dòng thức uống bạn yêu thích.</p>
+</div>
+
+<section class="mb-5" aria-labelledby="menu-categories-title">
+    <div class="d-flex justify-content-between align-items-end mb-3">
+        <h2 class="h4 mb-0" id="menu-categories-title">Danh mục thức uống</h2>
+        <c:if test="${not empty selectedCategoryId}">
+            <a class="small" href="<c:url value='/menu'/>">Xem tất cả</a>
+        </c:if>
+    </div>
+    <div class="row row-cols-2 row-cols-md-4 g-3">
+        <c:forEach var="card" items="${categoryCards}">
+            <div class="col">
+                <c:url var="categoryCardUrl" value="/menu">
+                    <c:param name="category" value="${card.id}"/>
+                </c:url>
+                <a class="menu-category-card card h-100 border-0 shadow-sm text-decoration-none ${selectedCategoryId == card.id ? 'is-active' : ''}"
+                   href="${categoryCardUrl}" aria-label="Xem danh mục ${card.name}">
+                    <c:choose>
+                        <c:when test="${not empty card.imageUrl}">
+                            <img class="menu-category-img" src="<c:out value='${card.imageUrl}'/>" alt="" loading="lazy">
+                        </c:when>
+                        <c:otherwise>
+                            <div class="menu-category-img product-img-placeholder" aria-hidden="true">🧋</div>
+                        </c:otherwise>
+                    </c:choose>
+                    <div class="card-body text-center py-3">
+                        <h3 class="h5 mb-0"><c:out value="${card.name}"/></h3>
+                    </div>
+                </a>
+            </div>
+        </c:forEach>
+    </div>
+</section>
 
 <%-- Tim kiem + sap xep (GET): giu lai danh muc dang chon --%>
 <form method="get" action="<c:url value='/menu'/>" class="row g-2 mb-3">
@@ -29,25 +65,6 @@
         <button type="submit" class="btn btn-utetra">Tìm</button>
     </div>
 </form>
-
-<%-- Loc theo danh muc --%>
-<div class="d-flex flex-wrap gap-2 mb-4">
-    <c:url var="allUrl" value="/menu">
-        <c:if test="${not empty q}"><c:param name="q" value="${q}"/></c:if>
-        <c:param name="sort" value="${sort}"/>
-    </c:url>
-    <a href="${allUrl}" class="btn btn-sm ${empty selectedCategoryId ? 'btn-utetra' : 'btn-outline-secondary'}">Tất cả</a>
-    <c:forEach var="cat" items="${categories}">
-        <c:url var="catUrl" value="/menu">
-            <c:param name="category" value="${cat.id}"/>
-            <c:if test="${not empty q}"><c:param name="q" value="${q}"/></c:if>
-            <c:param name="sort" value="${sort}"/>
-        </c:url>
-        <a href="${catUrl}" class="btn btn-sm ${selectedCategoryId == cat.id ? 'btn-utetra' : 'btn-outline-secondary'}">
-            <c:out value="${cat.name}"/>
-        </a>
-    </c:forEach>
-</div>
 
 <c:choose>
     <c:when test="${products.totalElements == 0}">

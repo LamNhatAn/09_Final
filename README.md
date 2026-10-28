@@ -42,6 +42,16 @@ Thanh toán: COD và VNPay (sandbox). Thông báo realtime và chat bằng WebSo
 
    Mỗi thành viên tự điền trên máy mình, **không gửi `api-secret` cho ai và không commit**. Nếu để trống, web vẫn chạy bình thường, chỉ không upload được ảnh (form sản phẩm sẽ báo "Chưa cấu hình Cloudinary").
 
+5. **VNPay sandbox:** lấy `TmnCode` và `HashSecret` trong tài khoản/email sandbox rồi thêm vào `application-local.properties`:
+
+   ```properties
+   vnpay.tmn-code=MA_WEBSITE_SANDBOX
+   vnpay.hash-secret=KHOA_BI_MAT_SANDBOX
+   vnpay.return-url=http://localhost:8080/payments/vnpay/return
+   ```
+
+   Không commit `HashSecret`. Khi triển khai thật, đăng ký IPN HTTPS công khai trỏ tới `/payments/vnpay/ipn`. Nếu chưa cấu hình, lựa chọn VNPay trên checkout sẽ bị khóa nhưng COD vẫn hoạt động.
+
 ## Chạy ứng dụng
 
 ```powershell
@@ -63,6 +73,7 @@ Chạy lệnh ở thư mục gốc dự án để ứng dụng đọc được `
 |---|---|
 | http://localhost:8080/ | Trang chủ: ô tìm kiếm, danh mục, 8 đồ uống mới nhất, 3 chi nhánh |
 | http://localhost:8080/menu | Thực đơn 12 đồ uống, 8 sản phẩm/trang, có phân trang (trang 2 có 4 sản phẩm) |
+| http://localhost:8080/contact | Thông tin điện thoại/email và form đánh giá website, thức uống, phục vụ |
 | http://localhost:8080/menu?category=3 | Chỉ 3 món cà phê |
 | http://localhost:8080/menu?q=tra sua | Tìm không dấu: ra 4 món trà sữa |
 | http://localhost:8080/products/1 | Chi tiết Trà sữa trân châu đen: giá 35.000 đ, size S/M/L, 6 topping, món cùng loại |
@@ -75,15 +86,17 @@ Chạy lệnh ở thư mục gốc dự án để ứng dụng đọc được `
 | http://localhost:8080/admin/categories | ADMIN: 4 danh mục kèm số sản phẩm, thêm/sửa/ẩn/xóa |
 | http://localhost:8080/admin/toppings | ADMIN: 6 topping, thêm/sửa/ẩn/xóa |
 | http://localhost:8080/cart | USER: xem, cập nhật hoặc xóa món trong giỏ hàng |
-| http://localhost:8080/checkout | USER: chọn chi nhánh, nhập thông tin giao hàng và đặt đơn COD |
+| http://localhost:8080/checkout | USER: chọn chi nhánh, thông tin giao hàng và thanh toán COD hoặc VNPay sandbox |
+| http://localhost:8080/payments/vnpay/return | Kết quả VNPay có kiểm tra chữ ký, số tiền và mã giao dịch |
 | http://localhost:8080/orders | USER: danh sách đơn của mình, phân trang và sắp mới nhất trước |
 | http://localhost:8080/orders/{code} | USER: chi tiết, lịch sử trạng thái và hủy đơn còn chờ xác nhận |
 | http://localhost:8080/admin/orders | ADMIN: lọc/tìm toàn bộ đơn, xem chi tiết và chuyển trạng thái đúng quy trình |
+| http://localhost:8080/admin/feedback | ADMIN: xem ý kiến khách hàng mới nhất, số sao và thông tin liên hệ |
 | http://localhost:8080/staff/orders | STAFF: chỉ xem, lọc, tìm và xử lý đơn thuộc chi nhánh được gán |
 | http://localhost:8080/staff/dashboard | STAFF/ADMIN: chuyển tới trang xử lý đơn; USER bị từ chối quyền |
 | http://localhost:8080/health | JSON `{"status":"UP","database":"utetra",...}` |
 
-Các bước kiểm tra đăng nhập/phân quyền từng bước: xem [docs/03-auth.md](docs/03-auth.md). Trang thực đơn: xem [docs/04-catalog.md](docs/04-catalog.md). Quản trị sản phẩm, danh mục, topping, upload ảnh: xem [docs/05-admin-catalog.md](docs/05-admin-catalog.md). Giỏ hàng và đặt hàng COD: xem [docs/06-cart-checkout.md](docs/06-cart-checkout.md). Theo dõi và hủy đơn của khách: xem [docs/07-customer-orders.md](docs/07-customer-orders.md). Nhân viên xử lý đơn theo chi nhánh: xem [docs/08-staff-order-workflow.md](docs/08-staff-order-workflow.md).
+Các bước kiểm tra đăng nhập/phân quyền từng bước: xem [docs/03-auth.md](docs/03-auth.md). Trang thực đơn: xem [docs/04-catalog.md](docs/04-catalog.md). Quản trị sản phẩm, danh mục, topping, upload ảnh: xem [docs/05-admin-catalog.md](docs/05-admin-catalog.md). Giỏ hàng và đặt hàng COD: xem [docs/06-cart-checkout.md](docs/06-cart-checkout.md). Theo dõi và hủy đơn của khách: xem [docs/07-customer-orders.md](docs/07-customer-orders.md). Nhân viên xử lý đơn theo chi nhánh: xem [docs/08-staff-order-workflow.md](docs/08-staff-order-workflow.md). Thanh toán VNPay sandbox: xem [docs/09-vnpay-sandbox.md](docs/09-vnpay-sandbox.md).
 
 ## Tài khoản mẫu (mật khẩu chung: `Utetra@123`)
 

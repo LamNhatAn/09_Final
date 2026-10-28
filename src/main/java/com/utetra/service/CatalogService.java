@@ -1,6 +1,7 @@
 package com.utetra.service;
 
 import com.utetra.dto.BranchInfo;
+import com.utetra.dto.MenuCategoryCard;
 import com.utetra.entity.Branch;
 import com.utetra.entity.Category;
 import com.utetra.entity.Product;
@@ -83,6 +84,15 @@ public class CatalogService {
 
     public List<Category> activeCategories() {
         return categoryRepository.findByActiveTrueOrderByIdAsc();
+    }
+
+    public List<MenuCategoryCard> menuCategoryCards() {
+        return productRepository.findCategoryRepresentatives().stream()
+                .map(product -> new MenuCategoryCard(
+                        product.getCategory().getId(),
+                        product.getCategory().getName(),
+                        product.getImageUrl()))
+                .toList();
     }
 
     public List<Size> sizes() {

@@ -1,14 +1,24 @@
 package com.utetra.service;
 
 import com.utetra.entity.Branch;
+import com.utetra.entity.Category;
+import com.utetra.entity.Product;
+import com.utetra.repository.BranchRepository;
+import com.utetra.repository.CategoryRepository;
+import com.utetra.repository.ProductRepository;
+import com.utetra.repository.SizeRepository;
+import com.utetra.repository.ToppingRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Sort;
 
 import java.time.LocalTime;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class CatalogServiceTest {
 
@@ -59,5 +69,25 @@ class CatalogServiceTest {
     @Test
     void branchWithoutHoursIsAlwaysOpen() {
         assertTrue(CatalogService.isOpen(new Branch(), LocalTime.of(3, 0)));
+    }
+
+    @Test
+    void menuCategoryCardsUseRepresentativeProductImage() {
+        ProductRepository products = mock(ProductRepository.class);
+        Category category = new Category();
+        category.setId(1L);
+        category.setName("Trà sữa");
+        Product representative = new Product();
+        representative.setCategory(category);
+        representative.setImageUrl("https://example.test/tra-sua.jpg");
+        when(products.findCategoryRepresentatives()).thenReturn(List.of(representative));
+
+        CatalogService service = new CatalogService(products, mock(CategoryRepository.class),
+                mock(BranchRepository.class), mock(SizeRepository.class), mock(ToppingRepository.class));
+
+        var cards = service.menuCategoryCards();
+        assertEquals(1, cards.size());
+        assertEquals("Trà sữa", cards.get(0).name());
+        assertEquals("https://example.test/tra-sua.jpg", cards.get(0).imageUrl());
     }
 }

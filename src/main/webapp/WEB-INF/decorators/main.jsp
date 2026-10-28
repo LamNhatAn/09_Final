@@ -24,6 +24,7 @@
                 <li class="nav-item"><a class="nav-link" href="<c:url value='/'/>">Trang chủ</a></li>
                 <li class="nav-item"><a class="nav-link" href="<c:url value='/menu'/>">Thực đơn</a></li>
                 <li class="nav-item"><a class="nav-link" href="<c:url value='/branches'/>">Chi nhánh</a></li>
+                <li class="nav-item"><a class="nav-link" href="<c:url value='/contact'/>">Liên hệ</a></li>
             </ul>
             <ul class="navbar-nav align-items-lg-center">
                 <c:if test="${empty currentUser or currentUser.customer}">
@@ -68,8 +69,15 @@
     <sitemesh:write property='body'/>
 </main>
 
-<footer class="utetra-footer text-center py-3">
-    <small>&copy; 2026 UTETra - Chuỗi trà sữa UTETra</small>
+<footer class="utetra-footer py-4">
+    <div class="container d-flex flex-column flex-md-row justify-content-between align-items-center gap-2">
+        <small>&copy; 2026 UTETra - Chuỗi trà sữa UTETra</small>
+        <div class="small d-flex flex-wrap justify-content-center gap-3">
+            <a href="tel:0944884068">☎ 0944 884 068</a>
+            <a href="mailto:2416200@student.hmcute.edu.vn">✉ 2416200@student.hmcute.edu.vn</a>
+            <a href="<c:url value='/contact'/>">Gửi ý kiến</a>
+        </div>
+    </div>
 </footer>
 
 <script src="<c:url value='/webjars/bootstrap/5.3.3/js/bootstrap.bundle.min.js'/>"></script>

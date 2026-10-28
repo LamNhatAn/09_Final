@@ -3,6 +3,8 @@ package com.utetra.service;
 import com.utetra.dto.CartLine;
 import com.utetra.dto.CartView;
 import com.utetra.dto.CheckoutForm;
+import com.utetra.dto.CheckoutResult;
+import com.utetra.dto.VnpayPaymentRequest;
 import com.utetra.entity.Branch;
 import com.utetra.entity.Cart;
 import com.utetra.entity.CartItem;
@@ -10,6 +12,7 @@ import com.utetra.entity.Order;
 import com.utetra.entity.OrderItem;
 import com.utetra.entity.OrderItemTopping;
 import com.utetra.entity.OrderStatusHistory;
+import com.utetra.entity.Payment;
 import com.utetra.entity.Topping;
 import com.utetra.entity.User;
 import com.utetra.entity.enums.OrderStatus;
@@ -19,8 +22,8 @@ import com.utetra.repository.BranchRepository;
 import com.utetra.repository.CartRepository;
 import com.utetra.repository.OrderRepository;
 import com.utetra.repository.OrderStatusHistoryRepository;
+import com.utetra.repository.PaymentRepository;
 import com.utetra.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,16 +34,28 @@ import java.util.Locale;
 import java.util.UUID;
 
 @Service
-@RequiredArgsConstructor
 public class CheckoutService {
 
     private static final DateTimeFormatter CODE_TIME = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss");
+    private static final DateTimeFormatter PAYMENT_TIME = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
 
     private final CartRepository cartRepository;
     private final UserRepository userRepository;
     private final BranchRepository branchRepository;
     private final OrderRepository orderRepository;
     private final OrderStatusHistoryRepository historyRepository;
+    private final PaymentRepository paymentRepository;
+
+    public CheckoutService(CartRepository cartRepository, UserRepository userRepository,
+                           BranchRepository branchRepository, OrderRepository orderRepository,
+                           OrderStatusHistoryRepository historyRepository, PaymentRepository paymentRepository) {
+        this.cartRepository = cartRepository;
+        this.userRepository = userRepository;
+        this.branchRepository = branchRepository;
+        this.orderRepository = orderRepository;
+        this.historyRepository = historyRepository;
+        this.paymentRepository = paymentRepository;
+    }
 
     @Transactional(readOnly = true)
     public CheckoutForm defaultForm(Long userId) {
@@ -55,6 +70,19 @@ public class CheckoutService {
 
     @Transactional
     public Order placeCod(Long userId, CheckoutForm form) {
+        form.setPaymentMethod(PaymentMethod.COD);
+        return placeOrder(userId, form).order();
+    }
+
+    @Transactional
+    public CheckoutResult place(Long userId, CheckoutForm form) {
+        if (form.getPaymentMethod() == null) {
+            throw new CheckoutException("Phương thức thanh toán không hợp lệ");
+        }
+        return placeOrder(userId, form);
+    }
+
+    private CheckoutResult placeOrder(Long userId, CheckoutForm form) {
         User user = userRepository.findById(userId)
                 .filter(User::isActive)
                 .orElseThrow(() -> new CheckoutException("Tài khoản không còn hoạt động"));
@@ -79,7 +107,7 @@ public class CheckoutService {
         order.setUser(user);
         order.setBranch(branch);
         order.setStatus(OrderStatus.PENDING);
-        order.setPaymentMethod(PaymentMethod.COD);
+        order.setPaymentMethod(form.getPaymentMethod());
         order.setPaymentStatus(PaymentStatus.UNPAID);
         order.setTotalAmount(cartView.subtotal());
         order.setReceiverName(form.getReceiverName().trim());
@@ -98,8 +126,20 @@ public class CheckoutService {
         history.setChangedBy(userId);
         historyRepository.save(history);
 
+        VnpayPaymentRequest vnpayRequest = null;
+        if (form.getPaymentMethod() == PaymentMethod.VNPAY) {
+            Payment payment = new Payment();
+            payment.setOrder(saved);
+            payment.setMethod(PaymentMethod.VNPAY);
+            payment.setAmount(saved.getTotalAmount());
+            payment.setStatus(PaymentStatus.UNPAID);
+            payment.setVnpTxnRef(generatePaymentReference());
+            paymentRepository.save(payment);
+            vnpayRequest = new VnpayPaymentRequest(payment.getVnpTxnRef(), saved.getCode(), payment.getAmount());
+        }
+
         cart.getItems().clear();
-        return saved;
+        return new CheckoutResult(saved, vnpayRequest);
     }
 
     @Transactional(readOnly = true)
@@ -138,6 +178,11 @@ public class CheckoutService {
     private static String generateCode() {
         String random = UUID.randomUUID().toString().substring(0, 8).toUpperCase(Locale.ROOT);
         return "UTE-" + LocalDateTime.now().format(CODE_TIME) + "-" + random;
+    }
+
+    private static String generatePaymentReference() {
+        String random = UUID.randomUUID().toString().substring(0, 8).toUpperCase(Locale.ROOT);
+        return "VNP-" + LocalDateTime.now().format(PAYMENT_TIME) + "-" + random;
     }
 
     private static String normalize(String value) {

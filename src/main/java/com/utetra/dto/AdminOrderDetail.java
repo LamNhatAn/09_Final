@@ -3,6 +3,8 @@ package com.utetra.dto;
 import com.utetra.entity.Order;
 import com.utetra.entity.OrderStatusHistory;
 import com.utetra.entity.enums.OrderStatus;
+import com.utetra.entity.enums.PaymentMethod;
+import com.utetra.entity.enums.PaymentStatus;
 
 import java.util.List;
 
@@ -17,14 +19,19 @@ public record AdminOrderDetail(Order order, List<OrderStatusHistory> history) {
     }
 
     public boolean isConfirmable() {
-        return order.getStatus() == OrderStatus.PENDING;
+        return order.getStatus() == OrderStatus.PENDING && isPaymentReady();
     }
 
     public boolean isAdvanceable() {
-        return order.getStatus().next() != null;
+        return order.getStatus().next() != null && isPaymentReady();
     }
 
     public OrderStatus getNextStatus() {
         return order.getStatus().next();
+    }
+
+    private boolean isPaymentReady() {
+        return order.getPaymentMethod() != PaymentMethod.VNPAY
+                || order.getPaymentStatus() == PaymentStatus.PAID;
     }
 }

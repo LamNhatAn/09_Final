@@ -4,6 +4,8 @@ import com.utetra.dto.CustomerOrderDetail;
 import com.utetra.entity.Order;
 import com.utetra.entity.OrderStatusHistory;
 import com.utetra.entity.enums.OrderStatus;
+import com.utetra.entity.enums.PaymentMethod;
+import com.utetra.entity.enums.PaymentStatus;
 import com.utetra.repository.OrderRepository;
 import com.utetra.repository.OrderStatusHistoryRepository;
 import lombok.RequiredArgsConstructor;
@@ -47,8 +49,10 @@ public class CustomerOrderService {
     public void cancel(Long userId, String code) {
         Order order = orderRepository.findOwnedForUpdate(code, userId)
                 .orElseThrow(() -> new CustomerOrderException("Không tìm thấy đơn hàng"));
-        if (order.getStatus() != OrderStatus.PENDING) {
-            throw new CustomerOrderException("Chỉ có thể hủy đơn đang chờ xác nhận");
+        if (order.getStatus() != OrderStatus.PENDING
+                || (order.getPaymentMethod() == PaymentMethod.VNPAY
+                && order.getPaymentStatus() != PaymentStatus.FAILED)) {
+            throw new CustomerOrderException("Đơn hàng không thể hủy trực tiếp");
         }
 
         order.setStatus(OrderStatus.CANCELLED);

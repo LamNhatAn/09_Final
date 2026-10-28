@@ -1,5 +1,7 @@
 package com.utetra.dto;
 
+import com.utetra.entity.enums.PaymentMethod;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -10,6 +12,9 @@ import lombok.Setter;
 @Getter
 @Setter
 public class CheckoutForm {
+
+    @NotNull(message = "Vui lòng chọn phương thức thanh toán")
+    private PaymentMethod paymentMethod = PaymentMethod.COD;
 
     @NotNull(message = "Vui lòng chọn chi nhánh")
     private Long branchId;

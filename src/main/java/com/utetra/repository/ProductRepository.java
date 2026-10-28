@@ -48,6 +48,16 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             """)
     List<Product> findLatest(Pageable pageable);
 
+    /** Mỗi danh mục lấy sản phẩm đang bán đầu tiên làm ảnh đại diện trên trang thực đơn. */
+    @Query("""
+            select p from Product p join fetch p.category c
+            where p.available = true and c.active = true
+              and p.id = (select min(p2.id) from Product p2
+                          where p2.category = c and p2.available = true)
+            order by c.id
+            """)
+    List<Product> findCategoryRepresentatives();
+
     @Query("""
             select p from Product p join fetch p.category c
             where p.available = true and c.active = true and c.id = :categoryId and p.id <> :excludeId

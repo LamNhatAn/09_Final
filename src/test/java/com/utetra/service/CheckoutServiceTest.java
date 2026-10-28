@@ -6,6 +6,7 @@ import com.utetra.entity.Cart;
 import com.utetra.entity.CartItem;
 import com.utetra.entity.Category;
 import com.utetra.entity.Order;
+import com.utetra.entity.Payment;
 import com.utetra.entity.Product;
 import com.utetra.entity.Size;
 import com.utetra.entity.Topping;
@@ -17,9 +18,11 @@ import com.utetra.repository.BranchRepository;
 import com.utetra.repository.CartRepository;
 import com.utetra.repository.OrderRepository;
 import com.utetra.repository.OrderStatusHistoryRepository;
+import com.utetra.repository.PaymentRepository;
 import com.utetra.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 import java.math.BigDecimal;
 import java.util.Optional;
@@ -41,6 +44,7 @@ class CheckoutServiceTest {
     private BranchRepository branchRepository;
     private OrderRepository orderRepository;
     private OrderStatusHistoryRepository historyRepository;
+    private PaymentRepository paymentRepository;
     private CheckoutService service;
 
     @BeforeEach
@@ -50,8 +54,9 @@ class CheckoutServiceTest {
         branchRepository = mock(BranchRepository.class);
         orderRepository = mock(OrderRepository.class);
         historyRepository = mock(OrderStatusHistoryRepository.class);
+        paymentRepository = mock(PaymentRepository.class);
         service = new CheckoutService(cartRepository, userRepository, branchRepository,
-                orderRepository, historyRepository);
+                orderRepository, historyRepository, paymentRepository);
         when(orderRepository.save(any(Order.class))).thenAnswer(i -> i.getArgument(0));
     }
 
@@ -88,6 +93,28 @@ class CheckoutServiceTest {
 
         assertThrows(CheckoutException.class, () -> service.placeCod(7L, form()));
         verify(orderRepository, never()).save(any());
+    }
+
+    @Test
+    void placeVnpayCreatesUnpaidPaymentAttempt() {
+        User user = activeUser();
+        Cart cart = cart();
+        CheckoutForm form = form();
+        form.setPaymentMethod(PaymentMethod.VNPAY);
+        when(userRepository.findById(7L)).thenReturn(Optional.of(user));
+        when(branchRepository.findByIdAndActiveTrue(2L)).thenReturn(Optional.of(activeBranch()));
+        when(cartRepository.findDetailedByUserId(7L)).thenReturn(Optional.of(cart));
+
+        var result = service.place(7L, form);
+
+        assertTrue(result.requiresVnpay());
+        assertEquals(PaymentMethod.VNPAY, result.order().getPaymentMethod());
+        assertTrue(result.vnpayRequest().transactionRef().startsWith("VNP-"));
+        ArgumentCaptor<Payment> captor = ArgumentCaptor.forClass(Payment.class);
+        verify(paymentRepository).save(captor.capture());
+        assertEquals(PaymentStatus.UNPAID, captor.getValue().getStatus());
+        assertEquals(new BigDecimal("90000"), captor.getValue().getAmount());
+        assertTrue(cart.getItems().isEmpty());
     }
 
     @Test

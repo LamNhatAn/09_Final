@@ -1,6 +1,6 @@
 ﻿/* =====================================================================
    UTETra - schema.sql  (SQL Server)
-   Tao database + 16 bang. Chay lai file nay se XOA va TAO LAI toan bo bang.
+   Tao database + 17 bang. Chay lai file nay se XOA va TAO LAI toan bo bang.
    Chay:  sqlcmd -S localhost -E -C -f 65001 -i database\schema.sql
    ===================================================================== */
 IF DB_ID(N'utetra') IS NULL
@@ -17,6 +17,7 @@ GO
 /* ---------- Xoa bang cu (theo thu tu phu thuoc) ---------- */
 DROP TABLE IF EXISTS chat_messages;
 DROP TABLE IF EXISTS chat_conversations;
+DROP TABLE IF EXISTS feedbacks;
 DROP TABLE IF EXISTS payments;
 DROP TABLE IF EXISTS order_status_history;
 DROP TABLE IF EXISTS order_item_toppings;
@@ -240,7 +241,26 @@ CREATE TABLE chat_messages (
     CONSTRAINT fk_msg_sender       FOREIGN KEY (sender_id)       REFERENCES users(id)
 );
 CREATE INDEX ix_msg_conversation ON chat_messages(conversation_id, sent_at);
+
+/* ---------- Lien he / gop y ---------- */
+CREATE TABLE feedbacks (
+    id               BIGINT IDENTITY(1,1) PRIMARY KEY,
+    full_name        NVARCHAR(100)  NOT NULL,
+    email            NVARCHAR(150)  NOT NULL,
+    phone            NVARCHAR(20)   NULL,
+    branch_id        BIGINT         NULL,
+    topic            NVARCHAR(30)   NOT NULL,
+    rating           INT            NOT NULL,
+    content          NVARCHAR(2000) NOT NULL,
+    privacy_consent  BIT            NOT NULL,
+    created_at       DATETIME2      NOT NULL DEFAULT SYSDATETIME(),
+    CONSTRAINT fk_feedback_branch FOREIGN KEY (branch_id) REFERENCES branches(id),
+    CONSTRAINT ck_feedback_topic CHECK (topic IN ('COMPLAINT','PRAISE','SUGGESTION','WEBSITE','DRINK','SERVICE','OTHER')),
+    CONSTRAINT ck_feedback_rating CHECK (rating BETWEEN 1 AND 5),
+    CONSTRAINT ck_feedback_consent CHECK (privacy_consent = 1)
+);
+CREATE INDEX ix_feedback_created ON feedbacks(created_at DESC);
 GO
 
-PRINT N'schema.sql: da tao xong 16 bang.';
+PRINT N'schema.sql: da tao xong 17 bang.';
 GO

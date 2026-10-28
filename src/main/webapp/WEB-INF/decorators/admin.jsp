@@ -23,6 +23,7 @@
             <li class="nav-item"><a class="nav-link text-white" href="<c:url value='/admin/categories'/>">Danh mục</a></li>
             <li class="nav-item"><a class="nav-link text-white" href="<c:url value='/admin/toppings'/>">Topping</a></li>
             <li class="nav-item"><a class="nav-link text-white" href="<c:url value='/admin/orders'/>">Đơn hàng</a></li>
+            <li class="nav-item"><a class="nav-link text-white" href="<c:url value='/admin/feedback'/>">Ý kiến khách hàng</a></li>
             <li class="nav-item"><a class="nav-link text-white-50 disabled" href="#">Chi nhánh</a></li>
             <li class="nav-item"><a class="nav-link text-white-50 disabled" href="#">Người dùng / Nhân viên</a></li>
             <li class="nav-item"><a class="nav-link text-white-50 disabled" href="#">Hỗ trợ khách (chat)</a></li>

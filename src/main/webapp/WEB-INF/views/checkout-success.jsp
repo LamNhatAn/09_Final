@@ -12,7 +12,7 @@
 <div class="card shadow-sm mx-auto" style="max-width:760px"><div class="card-body p-4">
     <div class="row g-3 mb-3">
         <div class="col-md-6"><span class="text-muted">Chi nhánh</span><br><strong><c:out value="${order.branch.name}"/></strong></div>
-        <div class="col-md-6"><span class="text-muted">Thanh toán</span><br><strong>COD – khi nhận hàng</strong></div>
+        <div class="col-md-6"><span class="text-muted">Thanh toán</span><br><strong>${order.paymentMethod == 'COD' ? 'COD – khi nhận hàng' : 'VNPay'}</strong></div>
         <div class="col-md-6"><span class="text-muted">Người nhận</span><br><c:out value="${order.receiverName}"/> · <c:out value="${order.receiverPhone}"/></div>
         <div class="col-md-6"><span class="text-muted">Địa chỉ</span><br><c:out value="${order.deliveryAddress}"/></div>
     </div>
