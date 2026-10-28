@@ -4,6 +4,8 @@ import com.utetra.dto.CustomerOrderDetail;
 import com.utetra.entity.Order;
 import com.utetra.entity.OrderStatusHistory;
 import com.utetra.entity.enums.OrderStatus;
+import com.utetra.entity.enums.PaymentMethod;
+import com.utetra.entity.enums.PaymentStatus;
 import com.utetra.repository.OrderRepository;
 import com.utetra.repository.OrderStatusHistoryRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -118,6 +120,26 @@ class CustomerOrderServiceTest {
         assertEquals(OrderStatus.CONFIRMED, order.getStatus());
         verify(orderRepository, never()).save(any());
         verify(historyRepository, never()).save(any());
+    }
+
+    @Test
+    void paidVnpayOrderCannotBeCancelledWithoutRefund() {
+        Order order = order(OrderStatus.PENDING);
+        order.setPaymentMethod(PaymentMethod.VNPAY);
+        order.setPaymentStatus(PaymentStatus.PAID);
+        when(orderRepository.findOwnedForUpdate("UTE-1", 7L)).thenReturn(Optional.of(order));
+
+        assertThrows(CustomerOrderException.class, () -> service.cancel(7L, "UTE-1"));
+        assertFalse(new CustomerOrderDetail(order, List.of()).isCancellable());
+        verify(orderRepository, never()).save(any());
+    }
+
+    @Test
+    void unpaidVnpayOrderCanBeRetried() {
+        Order order = order(OrderStatus.PENDING);
+        order.setPaymentMethod(PaymentMethod.VNPAY);
+        order.setPaymentStatus(PaymentStatus.FAILED);
+        assertTrue(new CustomerOrderDetail(order, List.of()).isPayable());
     }
 
     @Test

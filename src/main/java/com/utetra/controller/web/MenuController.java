@@ -31,6 +31,7 @@ public class MenuController {
 
         model.addAttribute("products", products);
         model.addAttribute("categories", catalogService.activeCategories());
+        model.addAttribute("categoryCards", catalogService.menuCategoryCards());
         model.addAttribute("selectedCategoryId", categoryId);
         model.addAttribute("q", keyword);
         model.addAttribute("sort", sortKey);

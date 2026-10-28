@@ -4,6 +4,8 @@ import com.utetra.dto.AdminOrderDetail;
 import com.utetra.entity.Order;
 import com.utetra.entity.OrderStatusHistory;
 import com.utetra.entity.enums.OrderStatus;
+import com.utetra.entity.enums.PaymentMethod;
+import com.utetra.entity.enums.PaymentStatus;
 import com.utetra.repository.OrderRepository;
 import com.utetra.repository.OrderStatusHistoryRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -41,17 +43,19 @@ class StaffOrderServiceTest {
     @Test
     void listAlwaysScopesOrdersToStaffBranch() {
         Page<Order> expected = new PageImpl<>(List.of(order(OrderStatus.PREPARING)));
-        when(orderRepository.searchManagement(eq(3L), eq(OrderStatus.PREPARING), eq("%090%"), any(Pageable.class)))
+        when(orderRepository.searchStaffManagement(eq(3L), eq(OrderStatus.PREPARING), eq("%090%"),
+                eq(PaymentMethod.VNPAY), eq(PaymentStatus.PAID), any(Pageable.class)))
                 .thenReturn(expected);
 
         assertEquals(expected, service.list(3L, OrderStatus.PREPARING, "090", 1));
-        verify(orderRepository).searchManagement(eq(3L), eq(OrderStatus.PREPARING), eq("%090%"), any(Pageable.class));
+        verify(orderRepository).searchStaffManagement(eq(3L), eq(OrderStatus.PREPARING), eq("%090%"),
+                eq(PaymentMethod.VNPAY), eq(PaymentStatus.PAID), any(Pageable.class));
     }
 
     @Test
     void listRejectsStaffWithoutBranch() {
         assertThrows(StaffOrderException.class, () -> service.list(null, null, "", 1));
-        verify(orderRepository, never()).searchManagement(any(Long.class), any(), any(), any());
+        verify(orderRepository, never()).searchStaffManagement(any(Long.class), any(), any(), any(), any(), any());
     }
 
     @Test

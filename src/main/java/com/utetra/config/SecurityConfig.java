@@ -52,12 +52,13 @@ public class SecurityConfig {
                 // Spring Security 6 kiem tra ca forward noi bo (controller -> file JSP), phai cho qua
                 .dispatcherTypeMatchers(DispatcherType.FORWARD, DispatcherType.INCLUDE, DispatcherType.ERROR).permitAll()
                 .requestMatchers("/css/**", "/js/**", "/images/**", "/webjars/**", "/favicon.ico").permitAll()
-                .requestMatchers("/", "/login", "/register", "/403", "/error", "/health").permitAll()
+                .requestMatchers("/", "/login", "/register", "/contact", "/403", "/error", "/health").permitAll()
+                .requestMatchers(HttpMethod.GET, "/payments/vnpay/return", "/payments/vnpay/ipn").permitAll()
                 // Trang khach xem tu do (thuc don, chi tiet san pham, chi nhanh)
                 .requestMatchers(HttpMethod.GET, "/menu", "/products/**", "/branches").permitAll()
                 .requestMatchers("/admin/**").hasRole("ADMIN")
                 .requestMatchers("/staff/**").hasAnyRole("STAFF", "ADMIN")
-                .requestMatchers("/cart/**", "/checkout/**", "/orders/**").hasRole("USER")
+                .requestMatchers("/cart/**", "/checkout/**", "/orders/**", "/payments/**").hasRole("USER")
                 .anyRequest().authenticated())
             .exceptionHandling(ex -> ex
                 // Chua dang nhap -> chuyen sang trang login (kem next de quay lai sau khi dang nhap)

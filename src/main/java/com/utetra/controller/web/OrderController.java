@@ -35,8 +35,7 @@ public class OrderController {
         model.addAttribute("orders", orderService.list(user.getId(), page));
         model.addAttribute("dateTimeFormatter", DATE_TIME);
         model.addAttribute("okMessage", "cancelled".equals(ok) ? "Đã hủy đơn hàng." : null);
-        model.addAttribute("errMessage", "cannot-cancel".equals(err)
-                ? "Không thể hủy đơn này. Chỉ đơn đang chờ xác nhận mới được hủy." : null);
+        model.addAttribute("errMessage", errorMessage(err));
         return "orders/list";
     }
 
@@ -51,8 +50,7 @@ public class OrderController {
             model.addAttribute("detail", detail);
             model.addAttribute("dateTimeFormatter", DATE_TIME);
             model.addAttribute("okMessage", "cancelled".equals(ok) ? "Đã hủy đơn hàng." : null);
-            model.addAttribute("errMessage", "cannot-cancel".equals(err)
-                    ? "Không thể hủy đơn này. Chỉ đơn đang chờ xác nhận mới được hủy." : null);
+            model.addAttribute("errMessage", errorMessage(err));
             return "orders/detail";
         } catch (CustomerOrderException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy đơn hàng");
@@ -68,5 +66,15 @@ public class OrderController {
         } catch (CustomerOrderException e) {
             return "redirect:/orders/" + code + "?err=cannot-cancel";
         }
+    }
+
+    private static String errorMessage(String code) {
+        if ("cannot-cancel".equals(code)) {
+            return "Không thể hủy đơn này. Chỉ đơn hợp lệ đang chờ xác nhận mới được hủy.";
+        }
+        if ("payment".equals(code)) {
+            return "Không thể tạo lại giao dịch VNPay. Hãy kiểm tra cấu hình hoặc trạng thái đơn hàng.";
+        }
+        return null;
     }
 }

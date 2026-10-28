@@ -4,6 +4,8 @@ import com.utetra.dto.AdminOrderDetail;
 import com.utetra.entity.Order;
 import com.utetra.entity.OrderStatusHistory;
 import com.utetra.entity.enums.OrderStatus;
+import com.utetra.entity.enums.PaymentMethod;
+import com.utetra.entity.enums.PaymentStatus;
 import com.utetra.repository.OrderRepository;
 import com.utetra.repository.OrderStatusHistoryRepository;
 import lombok.RequiredArgsConstructor;
@@ -50,7 +52,8 @@ public class AdminOrderService {
         Order order = orderRepository.findByCodeForUpdate(code)
                 .orElseThrow(() -> new AdminOrderException("Không tìm thấy đơn hàng"));
         OrderStatus next = order.getStatus().next();
-        if (next == null) {
+        if (next == null || (order.getPaymentMethod() == PaymentMethod.VNPAY
+                && order.getPaymentStatus() != PaymentStatus.PAID)) {
             throw new AdminOrderException("Đơn hàng đã kết thúc, không thể chuyển tiếp");
         }
 

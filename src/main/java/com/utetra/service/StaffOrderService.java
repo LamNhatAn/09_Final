@@ -4,6 +4,8 @@ import com.utetra.dto.AdminOrderDetail;
 import com.utetra.entity.Order;
 import com.utetra.entity.OrderStatusHistory;
 import com.utetra.entity.enums.OrderStatus;
+import com.utetra.entity.enums.PaymentMethod;
+import com.utetra.entity.enums.PaymentStatus;
 import com.utetra.repository.OrderRepository;
 import com.utetra.repository.OrderStatusHistoryRepository;
 import lombok.RequiredArgsConstructor;
@@ -28,10 +30,12 @@ public class StaffOrderService {
         Sort sort = Sort.by(Sort.Order.desc("createdAt"), Sort.Order.desc("id"));
         PageRequest pageable = PageRequest.of(Math.max(page, 1) - 1, PAGE_SIZE, sort);
         String pattern = AdminOrderService.searchPattern(keyword);
-        Page<Order> result = orderRepository.searchManagement(branchId, status, pattern, pageable);
+        Page<Order> result = orderRepository.searchStaffManagement(branchId, status, pattern,
+                PaymentMethod.VNPAY, PaymentStatus.PAID, pageable);
         if (result.isEmpty() && result.getTotalPages() > 0
                 && pageable.getPageNumber() >= result.getTotalPages()) {
-            result = orderRepository.searchManagement(branchId, status, pattern,
+            result = orderRepository.searchStaffManagement(branchId, status, pattern,
+                    PaymentMethod.VNPAY, PaymentStatus.PAID,
                     PageRequest.of(result.getTotalPages() - 1, PAGE_SIZE, sort));
         }
         return result;
@@ -52,7 +56,8 @@ public class StaffOrderService {
         Order order = orderRepository.findByCodeAndBranchIdForUpdate(code, branchId)
                 .orElseThrow(() -> new StaffOrderException("Không tìm thấy đơn hàng của chi nhánh"));
         OrderStatus next = order.getStatus().next();
-        if (next == null) {
+        if (next == null || (order.getPaymentMethod() == PaymentMethod.VNPAY
+                && order.getPaymentStatus() != PaymentStatus.PAID)) {
             throw new StaffOrderException("Đơn hàng đã kết thúc, không thể chuyển tiếp");
         }
 

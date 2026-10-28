@@ -16,6 +16,9 @@ cloudinary.cloud-name=
 cloudinary.api-key=
 cloudinary.api-secret=
 
-# Cac muc duoi day dung o cac ngay sau
-# vnpay.tmn-code=
-# vnpay.hash-secret=
+# VNPay sandbox (Day 9): lay trong email/tai khoan merchant sandbox. KHONG commit khoa that.
+vnpay.tmn-code=MA_WEBSITE_SANDBOX
+vnpay.hash-secret=KHOA_BI_MAT_SANDBOX
+# Localhost chi nhan Return URL trong trinh duyet. IPN production can URL HTTPS cong khai:
+# https://ten-mien-cua-ban/payments/vnpay/ipn
+vnpay.return-url=http://localhost:8080/payments/vnpay/return

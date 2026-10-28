@@ -72,18 +72,47 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
                                  @Param("pattern") String pattern,
                                  Pageable pageable);
 
+    @Query(value = """
+            select o from Order o
+            join fetch o.branch b
+            join fetch o.user u
+            where b.id = :branchId
+              and (:status is null or o.status = :status)
+              and (o.code like :pattern escape '!' or o.receiverPhone like :pattern escape '!')
+              and (o.paymentMethod <> :vnpay or o.paymentStatus = :paid)
+            """,
+            countQuery = """
+            select count(o) from Order o
+            where o.branch.id = :branchId
+              and (:status is null or o.status = :status)
+              and (o.code like :pattern escape '!' or o.receiverPhone like :pattern escape '!')
+              and (o.paymentMethod <> :vnpay or o.paymentStatus = :paid)
+            """)
+    Page<Order> searchStaffManagement(@Param("branchId") long branchId,
+                                      @Param("status") com.utetra.entity.enums.OrderStatus status,
+                                      @Param("pattern") String pattern,
+                                      @Param("vnpay") com.utetra.entity.enums.PaymentMethod vnpay,
+                                      @Param("paid") com.utetra.entity.enums.PaymentStatus paid,
+                                      Pageable pageable);
+
     @Query("""
             select distinct o from Order o
             join fetch o.branch
             join fetch o.user
             left join fetch o.items
             where o.code = :code and o.branch.id = :branchId
+              and (o.paymentMethod <> com.utetra.entity.enums.PaymentMethod.VNPAY
+                   or o.paymentStatus = com.utetra.entity.enums.PaymentStatus.PAID)
             """)
     Optional<Order> findDetailedByCodeAndBranchId(@Param("code") String code,
                                                   @Param("branchId") Long branchId);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query("select o from Order o where o.code = :code and o.branch.id = :branchId")
+    @Query("""
+            select o from Order o where o.code = :code and o.branch.id = :branchId
+              and (o.paymentMethod <> com.utetra.entity.enums.PaymentMethod.VNPAY
+                   or o.paymentStatus = com.utetra.entity.enums.PaymentStatus.PAID)
+            """)
     Optional<Order> findByCodeAndBranchIdForUpdate(@Param("code") String code,
                                                    @Param("branchId") Long branchId);
 }

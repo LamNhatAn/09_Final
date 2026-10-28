@@ -4,6 +4,8 @@ import com.utetra.dto.AdminOrderDetail;
 import com.utetra.entity.Order;
 import com.utetra.entity.OrderStatusHistory;
 import com.utetra.entity.enums.OrderStatus;
+import com.utetra.entity.enums.PaymentMethod;
+import com.utetra.entity.enums.PaymentStatus;
 import com.utetra.repository.OrderRepository;
 import com.utetra.repository.OrderStatusHistoryRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -117,6 +119,18 @@ class AdminOrderServiceTest {
         when(orderRepository.findByCodeForUpdate("MISSING")).thenReturn(Optional.empty());
 
         assertThrows(AdminOrderException.class, () -> service.advance(99L, "MISSING"));
+        verify(historyRepository, never()).save(any());
+    }
+
+    @Test
+    void advanceRejectsUnpaidVnpayOrder() {
+        Order order = order(OrderStatus.PENDING);
+        order.setPaymentMethod(PaymentMethod.VNPAY);
+        order.setPaymentStatus(PaymentStatus.UNPAID);
+        when(orderRepository.findByCodeForUpdate("UTE-1")).thenReturn(Optional.of(order));
+
+        assertThrows(AdminOrderException.class, () -> service.advance(99L, "UTE-1"));
+        assertFalse(new AdminOrderDetail(order, List.of()).isAdvanceable());
         verify(historyRepository, never()).save(any());
     }
 
