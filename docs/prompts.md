@@ -1,27 +1,69 @@
-# Nhật ký prompt AI (UTETra)
+# NHẬT KÝ PROMPT AI – DỰ ÁN UTETra
 
-Yêu cầu của đề: liệt kê các prompt đã dùng để AI sinh code/hình. Ghi thêm mỗi ngày.
+## 1. Mục đích tài liệu
 
-| Ngày | Mục đích | Prompt (tóm tắt) | Kết quả |
+Tài liệu này tổng hợp các yêu cầu chính mà nhóm đã nhập cho trợ lý AI trong quá trình phát triển UTETra. Nội dung được chuẩn hóa và rút gọn để dễ kiểm tra, không sao chép nguyên văn toàn bộ hội thoại, nhưng vẫn giữ đầy đủ mục tiêu, phạm vi xử lý và kết quả kỹ thuật.
+
+AI được sử dụng như công cụ hỗ trợ phân tích, đề xuất mã nguồn, tìm lỗi, viết kiểm thử và chuẩn hóa tài liệu. Nhóm chịu trách nhiệm lựa chọn giải pháp, chạy thử, kiểm tra kết quả và quyết định nội dung đưa vào repository.
+
+## 2. Quy ước sử dụng
+
+- Không yêu cầu AI tự quyết định yêu cầu nghiệp vụ quan trọng khi chưa có xác nhận của nhóm.
+- Chỉ chỉnh sửa chức năng thuộc Day hoặc phạm vi được yêu cầu.
+- Mã nguồn của Lâm Nhật An và Nguyễn Tiến Đạt được chia thành các commit riêng.
+- Khóa bí mật chỉ lưu trong `application-local.properties`, không đưa vào GitHub.
+- Kết quả phải được kiểm tra bằng test tự động, build và chạy thử giao diện.
+
+## 3. Nhật ký yêu cầu đã sử dụng
+
+| Mã | Giai đoạn | Prompt của nhóm (tóm tắt) | Kết quả/đầu ra chính |
 |---|---|---|---|
-| 0 | Lập kế hoạch | Đóng vai senior web developer và mentor, đọc đề tài UTETra, tóm tắt yêu cầu, hỏi điểm chưa rõ, đề xuất tech stack và kế hoạch 14 ngày | Kế hoạch 14 ngày, tech stack |
-| 0 | Chốt phạm vi | Dùng Cloudinary, SQL Server, thêm vai trò Staff, WebSocket (thông báo đơn + chat), thanh toán COD + VNPay | Phạm vi cuối |
-| 0 | Hướng dẫn tài khoản test | Hướng dẫn đăng ký VNPay sandbox, tìm hiểu MoMo test | Có tài khoản VNPay sandbox; bỏ MoMo vì không dùng được trên web |
-| 1 | Phân tích, thiết kế | Bắt đầu Day 1: use case, ERD, kiến trúc, cấu trúc package, luồng thanh toán và chat | `docs/01-analysis-design.md` |
-| 2 | Dựng khung dự án | Day 2: tạo project Spring Boot WAR (JSP, SiteMesh, Bootstrap, JPA, SQL Server), entity và repository theo ERD, database SQL, 3 layout main/staff/admin, trang `/health`, README | Project `UTETra/` chạy được; database cuối cùng được hợp nhất tại `database/nhom9_Database.sql` |
-| 2 | Sửa lỗi SiteMesh | Trang JSP trả 400 vì đường dẫn layout bị lặp tiền tố `/WEB-INF/decorators//...`; chỉ khai báo tên file layout | `SiteMeshConfig.java` |
-| 3 | Đăng ký, đăng nhập, JWT, phân quyền | Day 3: đăng ký/đăng nhập/đăng xuất, JWT trong cookie HttpOnly (jjwt), phân quyền USER/STAFF/ADMIN, trang 403, CSRF, cập nhật navbar 3 layout, unit test JwtService | `security/`, `SecurityConfig.java`, `AuthController.java`, `views/auth/`, `docs/03-auth.md` |
-| 3 | Sửa lỗi forward JSP | Sau khi bật phân quyền, mọi trang bị chuyển về `/login?next=/WEB-INF/views/...` vì Spring Security 6 kiểm tra cả dispatcher FORWARD; thêm `dispatcherTypeMatchers(FORWARD, INCLUDE, ERROR).permitAll()` | `SecurityConfig.java` |
-| 3 | Sửa lỗi Đăng xuất bị 403 | Bấm Đăng xuất ra `/403`: CSRF token bị đổi ở mọi request đã xác thực (SessionManagementFilter); tắt sessionManagement + NullRequestCache + RequestAttributeSecurityContextRepository | `SecurityConfig.java` |
-| 4 | Trang khách: thực đơn, tìm kiếm, chi tiết, chi nhánh | Day 4: trang chủ, thực đơn lọc theo danh mục + tìm kiếm + sắp xếp + phân trang, chi tiết sản phẩm (size, topping), danh sách chi nhánh, trang 404; chia việc: backend cho LamNhatAn, giao diện JSP cho Nguyễn Tiến Đạt | `CatalogService`, `MenuController`, `ProductController`, `BranchController`, `views/*.jsp`, `docs/04-catalog.md` |
-| 4 | Sửa lỗi tìm kiếm không dấu | Tìm "tra sua" không ra "Trà sữa": collation Vietnamese coi dấu thanh là chữ riêng, và `cast(... as String)` của Hibernate thành varchar làm mất chữ `ữ`; dùng `sql('case when ? collate Latin1_General_100_CI_AI like ? ...')` | `ProductRepository.java` |
-| 4 | Sửa lỗi hiển thị giá và trang lỗi | Giá hiện 35,000 thay vì 35.000 (`fmt:setLocale` không có tác dụng) nên thêm `FixedLocaleResolver` vi-VN; trang 403/404 không có layout nên bật `setIncludeErrorPages(true)` và dispatcher ERROR cho SiteMesh | `LocaleConfig.java`, `SiteMeshConfig.java` |
-| 5 | Admin: sản phẩm, danh mục, topping, upload ảnh Cloudinary | Day 5: CRUD sản phẩm có upload ảnh lên Cloudinary (kiểm tra magic bytes, tối đa 2 MB, đồng bộ xóa ảnh cũ), CRUD danh mục và topping, ẩn/hiện, chặn xóa khi đang dùng; chia việc: Cloudinary + sản phẩm cho LamNhatAn, danh mục + topping cho Nguyễn Tiến Đạt | `ImageStorageService`, `AdminProductService`, `AdminProductController`, `views/admin/**`, `docs/05-admin-catalog.md` |
-| 5 | Sửa lỗi upload ảnh quá lớn ra trang 403 | Ảnh > 5 MB làm Tomcat ngừng đọc body nên mất trường `_csrf` và bị 403; đặt thêm token CSRF trên URL của form có file để controller xử lý và báo "ảnh quá lớn" | `admin/products/form.jsp` |
-| 6 | Giỏ hàng và đặt hàng COD | Day 6: USER chọn size/topping/đường/đá/số lượng/ghi chú, thêm và quản lý giỏ; checkout chọn chi nhánh và thông tin nhận hàng; server tính lại giá, snapshot món, tạo đơn COD PENDING và xóa giỏ trong transaction; kiểm tra quyền sở hữu và viết test | `CartService`, `CheckoutService`, `CartController`, `CheckoutController`, `views/cart.jsp`, `views/checkout*.jsp`, `docs/06-cart-checkout.md` |
-| 7 | Theo dõi và xác nhận đơn hàng | Day 7: USER xem danh sách/chi tiết/lịch sử và hủy đơn PENDING; ADMIN xem toàn bộ đơn và xác nhận PENDING thành CONFIRMED; hai luồng dùng transaction, pessimistic lock, kiểm tra quyền, badge tiếng Việt và test | `CustomerOrderService`, `AdminOrderService`, hai controller, `OrderRepository`, `views/orders/*`, `views/admin/orders/*`, `docs/07-customer-orders.md` |
-| 8 | Nhân viên xử lý đơn theo chi nhánh | Day 8: STAFF chỉ xem/tìm/lọc và xử lý đơn của chi nhánh được gán; ADMIN lọc toàn hệ thống; chuyển đúng chuỗi PENDING → CONFIRMED → PREPARING → DELIVERING → COMPLETED, chặn đơn kết thúc, ghi lịch sử người đổi và khóa đồng thời | `StaffOrderService`, `AdminOrderService`, `OrderRepository`, hai controller, `views/staff/orders/*`, `views/admin/orders/*`, `docs/08-staff-order-workflow.md` |
-| 9 | Thanh toán VNPay sandbox | Day 9: checkout chọn COD/VNPay, tạo URL API 2.1.0 ký HMACSHA512, xử lý Return/IPN có kiểm tra chữ ký/mã merchant/số tiền, chống callback lặp, cho thanh toán lại, chỉ đưa đơn đã trả tới STAFF và viết test | `VnpayGateway`, `VnpayPaymentService`, `PaymentController`, `views/payment-result.jsp`, cập nhật checkout/đơn hàng, `docs/09-vnpay-sandbox.md` |
-| 9 | Liên hệ và góp ý | Thêm số điện thoại/email, form đánh giá website/thức uống/phục vụ, đồng ý bảo mật và trang ADMIN xem phản hồi; tham khảo bố cục trang liên hệ Gong Cha | `Feedback`, `FeedbackService`, `ContactController`, `views/contact.jsp`, `views/admin/feedback/*` |
-| 9 | Danh mục menu bằng hình ảnh | Trình bày các loại thức uống bằng tên và ảnh sản phẩm đại diện tương tự cách phân nhóm menu Gong Cha; chọn thẻ để lọc sản phẩm | `MenuCategoryCard`, `ProductRepository`, `CatalogService`, `menu.jsp`, `app.css` |
-| 10 | Thông báo realtime và bảo mật đăng ký | Cấu hình WebSocket/STOMP dùng JWT cookie; STAFF nhận đơn mới đúng chi nhánh, USER nhận trạng thái đơn; lưu thông báo chưa đọc, reconnect, chống trùng; đăng ký xác minh OTP email rồi mới tạo USER | `WebSocketConfig`, `Notification*`, `OrderNotification*`, `RegistrationOtp*`, `notifications.js`, các layout, `docs/10-realtime-notifications.md`, `docs/03-auth.md` |
+| P01 | Khảo sát dự án | Đọc toàn bộ workspace, tóm tắt kiến trúc, chức năng đã làm, phần còn thiếu và mức độ hiểu dự án. | Tổng quan Spring Boot, JSP, SQL Server, phân quyền và kế hoạch tiếp tục. |
+| P02 | Tổ chức nhóm | Ghi nhớ nhóm có hai thành viên; mỗi Day chia phần An/Đạt, dùng commit riêng và hướng dẫn push bằng một máy. | Quy ước phân công backend–frontend, tác giả commit và quy trình GitHub. |
+| P03 | Lập kế hoạch | Phân tích đề tài website chuỗi trà sữa, đề xuất công nghệ và kế hoạch thực hiện theo từng Day. | Kế hoạch phát triển, kiến trúc ba lớp, mô hình dữ liệu và phạm vi chức năng. |
+| P04 | Day 1 | Xây dựng use case, ERD, kiến trúc, package, luồng đặt hàng, thanh toán và thông báo. | `docs/01-analysis-design.md`. |
+| P05 | Day 2 | Tạo Spring Boot WAR dùng JSP/JSTL, SiteMesh, Bootstrap, JPA, SQL Server; tạo entity, repository, layout và health check. | Khung dự án, cấu hình chạy, database ban đầu và README. |
+| P06 | Day 2 – sửa lỗi | Kiểm tra lỗi SiteMesh/JSP do đường dẫn decorator bị lặp và sửa cấu hình. | Sửa `SiteMeshConfig`, trang JSP hiển thị đúng layout. |
+| P07 | Day 3 | Làm đăng ký, đăng nhập, đăng xuất, JWT cookie HttpOnly, BCrypt, CSRF và phân quyền USER/STAFF/ADMIN. | Security, controller xác thực, giao diện auth và kiểm thử JWT. |
+| P08 | Day 3 – sửa lỗi | Sửa chuyển hướng sai tới JSP nội bộ và lỗi đăng xuất 403 sau khi bật Spring Security. | Cho phép dispatcher nội bộ, cấu hình security context và CSRF phù hợp. |
+| P09 | Day 4 | Xây dựng trang chủ, thực đơn, tìm kiếm không dấu, lọc/sắp xếp/phân trang, chi tiết sản phẩm và chi nhánh. | Catalog backend, JSP khách hàng và tài liệu kiểm tra. |
+| P10 | Day 4 – sửa lỗi | Sửa tìm kiếm tiếng Việt không dấu, định dạng tiền Việt Nam và layout cho trang lỗi. | Truy vấn collation, locale `vi-VN`, trang 403/404 thống nhất. |
+| P11 | Day 5 | Hoàn thiện CRUD sản phẩm, danh mục, topping; upload ảnh Cloudinary; kiểm tra định dạng/kích thước ảnh và ràng buộc xóa. | Chức năng quản trị catalog và tài liệu Day 5. |
+| P12 | Day 5 – cấu hình | Giải thích `data.sql`, hướng dẫn lấy Cloud name/API key/API secret và xử lý lỗi upload Cloudinary. | Cấu hình local, không commit khóa bí mật; sửa thông báo upload. |
+| P13 | Day 6 | Làm giỏ hàng: size, đường, đá, topping, số lượng; checkout, chọn chi nhánh, giao hàng và COD. | Transaction tạo đơn, snapshot giá/món, xóa giỏ và kiểm thử. |
+| P14 | Day 6 – Git | Hướng dẫn chia danh sách file và commit riêng của An/Đạt; giải thích cảnh báo LF/CRLF và tạo pull request. | Hai commit có tên/email riêng, quy trình merge rõ ràng. |
+| P15 | Day 7 | Cho khách theo dõi/hủy đơn; cho admin truy cập, xác nhận và cập nhật trạng thái đơn. | Trang đơn khách hàng, quản trị đơn và lịch sử trạng thái. |
+| P16 | Day 8 | Xây dựng quy trình nhân viên theo chi nhánh: nhận đơn, pha chế, giao hàng, hoàn tất; sửa build và dữ liệu nhân viên Gò Vấp. | Staff workflow, giới hạn quyền theo chi nhánh và tài khoản mẫu. |
+| P17 | Day 9 | Tích hợp COD/VNPay sandbox, ký HMACSHA512, Return/IPN, kiểm tra chữ ký/số tiền, chống callback lặp. | Dịch vụ VNPay, trang kết quả, chức năng thanh toán lại và test. |
+| P18 | Day 9 – thanh toán | Cấu hình thông tin sandbox được cung cấp; giải thích QR/test card và lý do không thể thanh toán tiền thật bằng sandbox. | Cấu hình local, hướng dẫn kiểm thử an toàn và ghi rõ giới hạn sandbox. |
+| P19 | Day 9 – liên hệ | Thêm trang liên hệ, số điện thoại, email và form đánh giá; tham khảo cách trình bày của Gong Cha. | Trang contact, lưu feedback và trang admin xem phản hồi. |
+| P20 | Day 9 – menu | Trình bày danh mục thức uống bằng tên và hình đại diện tương tự menu Gong Cha. | Thẻ danh mục hình ảnh và lọc thực đơn. |
+| P21 | Day 10 | Làm thông báo realtime bằng WebSocket/STOMP; lưu lịch sử, số chưa đọc, chống trùng và phân quyền kết nối. | Notification backend, JavaScript realtime và kiểm thử bảo mật WebSocket. |
+| P22 | Day 10 – quy trình staff | Bỏ hộp thoại xác nhận bất tiện; tách đơn mới, đang pha chế và đang giao thành các bước/bảng rõ ràng. | Giao diện xử lý đơn theo từng giai đoạn, thông tin khách dễ đọc. |
+| P23 | Day 10 – OTP đăng ký | Yêu cầu tài khoản mới xác minh OTP email trước khi được tạo; hướng dẫn Gmail App Password. | OTP có thời hạn, giới hạn nhập, gửi lại và cấu hình SMTP local. |
+| P24 | Day 10 – admin | Hoàn thiện dashboard, quản lý chi nhánh, người dùng/nhân viên; loại bỏ mục trùng hoặc chưa sử dụng. | Thống kê quản trị và các trang CRUD cần thiết. |
+| P25 | Day 10 – tài khoản | Thêm quên mật khẩu qua OTP email với điều kiện mật khẩu giống đăng ký. | Luồng yêu cầu OTP, xác minh và đặt lại mật khẩu an toàn. |
+| P26 | Day 10 – giao hàng | Bắt buộc địa chỉ giao hàng đủ rõ khi khách chọn giao tận nơi. | Validation phía server và thông báo hướng dẫn nhập địa chỉ. |
+| P27 | Day 10 – thông báo khách | Chỉ thông báo thân thiện khi cửa hàng nhận đơn và khi đơn đã tới. | Giới hạn sự kiện thông báo khách, nội dung dễ hiểu và có mã đơn. |
+| P28 | Day 10 – tồn món | Cho STAFF ngừng/mở bán món; món hết vẫn hiển thị trên web với nhãn “Đã hết”. | Trạng thái sold-out, chặn thêm giỏ/checkout và giao diện tương ứng. |
+| P29 | Day 10 – topping | Chỉ cho chọn topping đối với sản phẩm thuộc danh mục Trà sữa. | Cờ danh mục, kiểm tra backend và ẩn topping ở sản phẩm không hợp lệ. |
+| P30 | Day 10 – sửa giỏ hàng | Sửa lỗi một ly có topping bị hiển thị thành nhiều dòng và làm tổng tiền tăng sai. | Loại bỏ join-fetch gây nhân bản, khử trùng DTO và thêm regression test. |
+| P31 | Hoàn thiện | Rà soát toàn bộ source, SQL, chức năng còn thiếu, tài liệu AI, khóa bí mật; chạy test và push bản cuối. | 117/117 test đạt, đóng gói WAR, hồ sơ nộp và hai commit thành viên. |
+| P32 | Hồ sơ database | Hợp nhất mọi SQL thành một file duy nhất và đổi tên thành `database/nhom9_Database.sql`. | Một file gồm 20 bảng, khóa/index và dữ liệu mẫu; cập nhật toàn bộ tài liệu. |
+| P33 | Hồ sơ AI | Viết lại `prompts.md` và `AI_DATASHEET.md` ngắn gọn, đầy đủ, minh bạch và có tính học thuật. | Nhật ký prompt chuẩn hóa và datasheet AI cuối kỳ. |
+
+## 4. Phương pháp kiểm chứng đầu ra AI
+
+1. Đối chiếu thay đổi với yêu cầu nghiệp vụ của từng Day.
+2. Kiểm tra quyền truy cập theo vai trò USER, STAFF và ADMIN.
+3. Kiểm tra database SQL, khóa ngoại, dữ liệu mẫu và khả năng khởi động ứng dụng.
+4. Chạy `.\mvnw.cmd clean test`; bản cuối đạt 117/117 kiểm thử.
+5. Chạy `.\mvnw.cmd package` để xác nhận đóng gói WAR thành công.
+6. Chạy thử các luồng chính trên trình duyệt và chỉ commit sau khi người dùng xác nhận.
+7. Quét Git để bảo đảm không commit mật khẩu, App Password hoặc API secret thật.
+
+## 5. Phân công trách nhiệm
+
+- **Lâm Nhật An:** phân tích nghiệp vụ, backend, database, bảo mật, tích hợp dịch vụ, kiểm thử và quản lý nhánh Git.
+- **Nguyễn Tiến Đạt:** JSP/CSS/JavaScript, trải nghiệm người dùng, giao diện quản trị/nhân viên và tài liệu kiểm tra.
+- **Trợ lý AI:** hỗ trợ đề xuất và rà soát; không thay thế trách nhiệm kỹ thuật, học thuật hoặc quyết định cuối cùng của hai thành viên.
