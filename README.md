@@ -63,13 +63,7 @@ Thanh toán: COD và VNPay (sandbox). Thông báo realtime bằng WebSocket. Ả
 
    `MAIL_PASSWORD` không phải mật khẩu đăng nhập Gmail và tuyệt đối không được commit. Nếu chưa cấu hình, website vẫn chạy nhưng form đăng ký sẽ báo không gửi được OTP.
 
-   Với database đã tạo từ trước, chạy thêm một lần:
-
-   ```powershell
-   sqlcmd -S localhost -E -C -f 65001 -i database\day10-add-password-reset-otps.sql
-   sqlcmd -S localhost -E -C -f 65001 -i database\day10-add-product-sold-out.sql
-   sqlcmd -S localhost -E -C -f 65001 -i database\day10-add-category-topping-rule.sql
-   ```
+   Database nộp bài đã được hợp nhất hoàn toàn trong `database\nhom9_Database.sql`; dự án không cần chạy thêm file migration riêng.
 
 ## Chạy ứng dụng
 
@@ -143,7 +137,7 @@ Các bước kiểm tra đăng nhập/phân quyền từng bước: xem [docs/03
 UTETra/
 ├── pom.xml, mvnw, mvnw.cmd
 ├── application-local.properties.example   (mẫu cấu hình bí mật)
-├── database/                              (schema.sql, data.sql)
+├── database/                              (nhom9_Database.sql)
 ├── docs/                                  (thiết kế, nhật ký prompt)
 └── src/main/
     ├── java/com/utetra/

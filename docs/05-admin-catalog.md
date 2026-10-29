@@ -22,7 +22,7 @@ Quy tắc dữ liệu:
 Tên danh mục và topping được kiểm tra ở cả ứng dụng lẫn `UNIQUE constraint` trong SQL Server để vẫn chặn được hai request tạo trùng tên cùng lúc. Với database đã tạo trước bản sửa này, chạy một lần:
 
 ```powershell
-sqlcmd -S localhost -E -C -f 65001 -i database\day5-add-unique-names.sql
+sqlcmd -S localhost -E -C -f 65001 -i database\nhom9_Database.sql
 ```
 
 Script không xóa dữ liệu. Nếu dữ liệu hiện tại đã có tên trùng, script sẽ dừng và yêu cầu xử lý bản ghi trùng trước.

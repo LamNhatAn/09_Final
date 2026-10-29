@@ -3,7 +3,7 @@
 ## 1. Thành phần nộp
 
 - **Source code:** toàn bộ repository này, không bao gồm file cấu hình bí mật `application-local.properties`.
-- **Database SQL nộp bài:** `database/nhom9_Database.sql` là file độc lập duy nhất, chứa cả cấu trúc và dữ liệu mẫu. `schema.sql`, `data.sql` và các file `day*.sql` được giữ lại để phát triển, cài đặt từng phần hoặc nâng cấp database cũ.
+- **Database SQL nộp bài:** `database/nhom9_Database.sql` là file SQL duy nhất của dự án, chứa đầy đủ cấu trúc và dữ liệu mẫu cuối cùng.
 - **Datasheet AI:** `docs/AI_DATASHEET.md`.
 - **GitHub:** <https://github.com/LamNhatAn/09_Final>
 - **Cấu hình mẫu:** `application-local.properties.example`. Người chấm sao chép thành `application-local.properties` và tự điền khóa DB, JWT, Cloudinary, VNPay sandbox và email SMTP.

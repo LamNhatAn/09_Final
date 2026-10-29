@@ -52,10 +52,10 @@ Event chỉ được xử lý ở pha `AFTER_COMMIT`, vì vậy database lỗi h
 Máy đã có dữ liệu cũ chạy một lần:
 
 ```powershell
-sqlcmd -S localhost -E -C -f 65001 -i database\day10-add-notifications.sql
+sqlcmd -S localhost -E -C -f 65001 -i database\nhom9_Database.sql
 ```
 
-Máy tạo database mới bằng `database/schema.sql` không cần chạy migration riêng.
+File `database/nhom9_Database.sql` đã chứa bảng thông báo và toàn bộ dữ liệu cuối cùng, không cần chạy migration riêng.
 
 ## 5. Phân công Day 10
 

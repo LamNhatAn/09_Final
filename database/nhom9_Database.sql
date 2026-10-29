@@ -7,9 +7,9 @@
 -- ================================================================
 
 /* =====================================================================
-   UTETra - schema.sql  (SQL Server)
+   UTETra - cau truc database (SQL Server)
    Tao database + 20 bang. Chay lai file nay se XOA va TAO LAI toan bo bang.
-   Chay:  sqlcmd -S localhost -E -C -f 65001 -i database\schema.sql
+   Chay: sqlcmd -S localhost -E -C -f 65001 -i database\nhom9_Database.sql
    ===================================================================== */
 IF DB_ID(N'utetra') IS NULL
     CREATE DATABASE utetra COLLATE Vietnamese_100_CI_AS;
@@ -326,7 +326,7 @@ CREATE INDEX ix_notifications_user_created ON notifications(user_id, created_at 
 CREATE INDEX ix_notifications_user_unread ON notifications(user_id, read_at);
 GO
 
-PRINT N'schema.sql: da tao xong 19 bang.';
+PRINT N'nhom9_Database.sql: da tao xong 20 bang.';
 GO
 
 -- ================================================================
@@ -334,8 +334,8 @@ GO
 -- ================================================================
 
 /* =====================================================================
-   UTETra - data.sql  (du lieu mau)
-   Chay SAU schema.sql:  sqlcmd -S localhost -E -C -f 65001 -i database\data.sql
+   UTETra - du lieu mau
+   Phan nay duoc chay ngay sau cau truc trong cung file nhom9_Database.sql.
    Mat khau MOI tai khoan mau: Utetra@123  (da ma hoa BCrypt)
    ===================================================================== */
 USE utetra;

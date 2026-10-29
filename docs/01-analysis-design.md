@@ -357,7 +357,7 @@ Kênh WebSocket (endpoint `/ws`, SockJS):
 UTETra/
 ├── pom.xml
 ├── application-local.properties.example   (mẫu cấu hình bí mật; file thật application-local.properties bị .gitignore)
-├── database/schema.sql, data.sql
+├── database/nhom9_Database.sql
 ├── docs/                         (tài liệu, sơ đồ, prompts.md)
 └── src/main/
     ├── java/com/utetra/
@@ -387,7 +387,7 @@ UTETra/
 
 | Ngày | Chức năng |
 |---|---|
-| 2 | Dựng khung, kết nối SQL Server, entity, `schema.sql`/`data.sql` |
+| 2 | Dựng khung, kết nối SQL Server, entity và database SQL thống nhất |
 | 3 | Đăng ký, đăng nhập, JWT cookie, phân quyền, trang 403 |
 | 4 | Trang chủ, menu theo danh mục, tìm kiếm, phân trang, chi tiết, chi nhánh |
 | 5 | Admin CRUD danh mục/sản phẩm/topping, upload Cloudinary |

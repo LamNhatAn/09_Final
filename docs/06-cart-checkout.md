@@ -23,7 +23,7 @@ Quy tắc chính:
 Database đã tồn tại từ Day trước cần chạy một lần:
 
 ```powershell
-sqlcmd -S localhost -E -C -f 65001 -i database\day6-cart-checkout.sql
+sqlcmd -S localhost -E -C -f 65001 -i database\nhom9_Database.sql
 ```
 
 Script thêm ghi chú món vào `order_items` và các `CHECK constraint`, không xóa dữ liệu.
@@ -77,7 +77,7 @@ Toàn bộ bước tạo đơn, lịch sử và xóa giỏ nằm trong một tra
 
 | Người | Phần việc | File chính |
 |---|---|---|
-| LamNhatAn | Nghiệp vụ giỏ hàng, tính giá, tạo đơn COD, snapshot và ràng buộc database | `CartService`, `CheckoutService`, DTO, repository, entity, controller, `database/day6-cart-checkout.sql`, test service |
+| LamNhatAn | Nghiệp vụ giỏ hàng, tính giá, tạo đơn COD, snapshot và ràng buộc database | `CartService`, `CheckoutService`, DTO, repository, entity, controller, `database/nhom9_Database.sql`, test service |
 | Nguyễn Tiến Đạt | Giao diện chọn món, giỏ hàng, checkout, trang thành công và tài liệu | `product-detail.jsp`, `cart.jsp`, `checkout.jsp`, `checkout-success.jsp`, `main.jsp`, `app.css`, `docs/06-cart-checkout.md`, README |
 
 ## 6. Kiểm tra từng bước (`user1@utetra.vn` / `Utetra@123`)
