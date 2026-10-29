@@ -31,6 +31,7 @@
     </div>
     <div class="col-12 col-md-7">
         <span class="badge text-bg-warning mb-2"><c:out value="${product.category.name}"/></span>
+        <c:if test="${product.soldOut}"><span class="badge text-bg-danger mb-2">Đã hết</span></c:if>
         <h1 class="h2"><c:out value="${product.name}"/></h1>
         <div class="h3 product-price mb-3">
             <fmt:formatNumber value="${product.basePrice}" type="number" groupingUsed="true"/> đ
@@ -70,6 +71,10 @@
         </c:if>
 
         <c:choose>
+            <c:when test="${product.soldOut}">
+                <div class="alert alert-warning mt-4"><strong>Món này đang tạm hết.</strong><br>UTETra vẫn giữ món trên thực đơn để bạn tiện theo dõi. Vui lòng chọn món khác hoặc quay lại sau nhé.</div>
+                <a class="btn btn-outline-secondary" href="<c:url value='/menu'/>">Chọn món khác</a>
+            </c:when>
             <c:when test="${not empty currentUser and currentUser.customer}">
                 <form method="post" action="<c:url value='/cart/items'/>" class="mt-4 border rounded-3 bg-white p-3">
                     <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}">

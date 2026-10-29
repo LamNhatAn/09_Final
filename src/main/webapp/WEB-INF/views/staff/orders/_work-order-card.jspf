@@ -1,0 +1,64 @@
+<%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" session="false" %>
+<article class="card border-0 shadow-sm staff-work-card">
+    <div class="card-body">
+        <div class="row g-3 align-items-start">
+            <div class="col-12 col-lg-2">
+                <a class="h6 d-block text-decoration-none mb-1" href="<c:url value='/staff/orders/${order.code}'/>">
+                    <c:out value="${order.code}"/>
+                </a>
+                <time class="small text-muted d-block mb-2"><c:out value="${order.createdAt.format(dateTimeFormatter)}"/></time>
+                <span class="badge ${order.status.badgeClass}"><c:out value="${order.status.label}"/></span>
+                <div class="fw-bold text-danger mt-2"><fmt:formatNumber value="${order.totalAmount}" type="number"/> đ</div>
+                <div class="small mt-1">
+                    <c:choose>
+                        <c:when test="${order.paymentMethod == 'COD'}">COD · Thu tiền khi giao</c:when>
+                        <c:otherwise>VNPay · <c:out value="${order.paymentStatus.label}"/></c:otherwise>
+                    </c:choose>
+                </div>
+            </div>
+
+            <div class="col-12 col-lg-4 border-lg-start">
+                <h3 class="h6">Món cần làm</h3>
+                <div class="staff-work-items">
+                    <c:forEach var="item" items="${order.items}">
+                        <div class="staff-work-item">
+                            <strong>${item.quantity}× <c:out value="${item.productName}"/></strong>
+                            <div class="small text-muted">
+                                Size <c:out value="${item.sizeName}"/> · Đường ${item.sugarPercent}% · Đá ${item.icePercent}%
+                            </div>
+                            <c:if test="${not empty item.toppings}">
+                                <div class="small text-muted">Topping: <c:forEach var="t" items="${item.toppings}" varStatus="loop"><c:out value="${t.toppingName}"/><c:if test="${!loop.last}">, </c:if></c:forEach></div>
+                            </c:if>
+                            <c:if test="${not empty item.note}"><div class="small text-danger">Ghi chú: <c:out value="${item.note}"/></div></c:if>
+                        </div>
+                    </c:forEach>
+                </div>
+                <c:if test="${not empty order.note}"><div class="alert alert-warning py-2 px-3 small mt-2 mb-0">Ghi chú đơn: <c:out value="${order.note}"/></div></c:if>
+            </div>
+
+            <div class="col-12 col-lg-3 border-lg-start">
+                <h3 class="h6">Thông tin liên hệ</h3>
+                <div class="mb-1"><strong><c:out value="${order.receiverName}"/></strong></div>
+                <div class="small mb-1">SĐT: <c:out value="${order.receiverPhone}"/></div>
+                <div class="small mb-2">Email: <c:out value="${order.user.email}"/></div>
+                <div class="small text-muted mb-2">Giao tới: <c:out value="${order.deliveryAddress}"/></div>
+                <div class="d-flex flex-wrap gap-2">
+                    <a class="btn btn-outline-primary btn-sm" href="tel:<c:out value='${order.receiverPhone}'/>">Gọi khách</a>
+                    <a class="btn btn-outline-primary btn-sm" href="sms:<c:out value='${order.receiverPhone}'/>">Nhắn SMS</a>
+                    <a class="btn btn-outline-secondary btn-sm" href="mailto:<c:out value='${order.user.email}'/>">Gửi email</a>
+                </div>
+            </div>
+
+            <div class="col-12 col-lg-3 border-lg-start">
+                <h3 class="h6">Thao tác</h3>
+                <p class="small text-muted"><c:out value="${actionHelp}"/></p>
+                <c:url var="workAction" value="${actionUrl}"/>
+                <form method="post" action="${workAction}">
+                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}">
+                    <c:if test="${not empty actionReturn}"><input type="hidden" name="returnTo" value="${actionReturn}"></c:if>
+                    <button class="btn btn-success w-100" type="submit"><c:out value="${actionLabel}"/></button>
+                </form>
+            </div>
+        </div>
+    </div>
+</article>

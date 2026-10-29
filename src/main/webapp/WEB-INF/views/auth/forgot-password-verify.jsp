@@ -1,0 +1,14 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8" session="false" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %><%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
+<html><head><title>Đặt lại mật khẩu</title></head><body><div class="row justify-content-center"><div class="col-md-7 col-lg-5"><div class="card shadow-sm border-0"><div class="card-body p-4 p-lg-5">
+    <div class="text-center mb-4"><div class="otp-mail-icon" aria-hidden="true">✉</div><h1 class="h4 mt-3 mb-2">Đặt lại mật khẩu</h1><p class="text-muted mb-0">Nếu email tồn tại, mã gồm 6 chữ số đã được gửi tới <strong><c:out value="${maskedEmail}"/></strong>.</p></div>
+    <c:if test="${not empty sentMessage}"><div class="alert alert-success"><c:out value="${sentMessage}"/></div></c:if><c:if test="${not empty resendError}"><div class="alert alert-danger"><c:out value="${resendError}"/></div></c:if>
+    <form:form method="post" action="${pageContext.request.contextPath}/forgot-password/verify" modelAttribute="resetPasswordForm" novalidate="novalidate">
+        <form:hidden path="email"/><div class="mb-3"><label class="form-label" for="code">Mã OTP</label><form:input path="code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" cssClass="form-control form-control-lg text-center otp-code-input" cssErrorClass="form-control form-control-lg text-center otp-code-input is-invalid" placeholder="000000"/><form:errors path="code" cssClass="invalid-feedback d-block"/></div>
+        <div class="mb-3"><label class="form-label" for="password">Mật khẩu mới</label><form:password path="password" autocomplete="new-password" cssClass="form-control" cssErrorClass="form-control is-invalid"/><form:errors path="password" cssClass="invalid-feedback d-block"/><div class="form-text">8–72 ký tự, gồm cả chữ và số.</div></div>
+        <div class="mb-3"><label class="form-label" for="confirmPassword">Nhập lại mật khẩu</label><form:password path="confirmPassword" autocomplete="new-password" cssClass="form-control" cssErrorClass="form-control is-invalid"/><form:errors path="confirmPassword" cssClass="invalid-feedback d-block"/></div>
+        <button class="btn btn-success w-100" type="submit">Xác nhận đổi mật khẩu</button>
+    </form:form>
+    <form method="post" action="<c:url value='/forgot-password/resend'/>" class="text-center mt-3"><input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"><input type="hidden" name="email" value="<c:out value='${resetPasswordForm.email}'/>"><span class="small text-muted">Chưa nhận được mã?</span><button class="btn btn-link btn-sm px-1" type="submit">Gửi lại OTP</button></form>
+    <p class="text-center mt-3 mb-0"><a href="<c:url value='/forgot-password'/>">← Nhập email khác</a></p>
+</div></div></div></div></body></html>

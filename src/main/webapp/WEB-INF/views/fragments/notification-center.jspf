@@ -1,0 +1,24 @@
+<%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" session="false" %>
+<div class="dropdown notification-center" id="notification-center"
+     data-context-path="${pageContext.request.contextPath}">
+    <button class="btn btn-sm btn-outline-warning position-relative" type="button"
+            id="notification-toggle" data-bs-toggle="dropdown" data-bs-auto-close="outside"
+            aria-expanded="false" aria-label="Thông báo">
+        <span aria-hidden="true">🔔</span>
+        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill text-bg-danger d-none"
+              id="notification-count">0</span>
+    </button>
+    <div class="dropdown-menu dropdown-menu-end notification-menu shadow" aria-labelledby="notification-toggle">
+        <div class="d-flex align-items-center justify-content-between px-3 py-2 border-bottom">
+            <strong>Thông báo</strong>
+            <button class="btn btn-link btn-sm p-0 text-decoration-none" id="notification-read-all" type="button">
+                Đánh dấu đã đọc
+            </button>
+        </div>
+        <div id="notification-list" class="notification-list">
+            <div class="text-center text-muted small py-4">Đang tải...</div>
+        </div>
+    </div>
+</div>
+
+<div class="toast-container position-fixed top-0 end-0 p-3 notification-toasts" id="notification-toasts"></div>

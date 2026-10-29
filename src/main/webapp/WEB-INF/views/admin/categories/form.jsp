@@ -35,6 +35,7 @@
         <form:checkbox path="active" cssClass="form-check-input" id="active"/>
         <label class="form-check-label" for="active">Hiển thị trên trang khách</label>
     </div>
+    <div class="alert alert-light border small">Topping được hệ thống tự động áp dụng riêng cho danh mục <strong>Trà sữa</strong>.</div>
     <div class="d-flex gap-2">
         <button type="submit" class="btn btn-utetra">Lưu</button>
         <a class="btn btn-outline-secondary" href="<c:url value='/admin/categories'/>">Hủy</a>

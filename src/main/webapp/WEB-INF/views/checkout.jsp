@@ -59,9 +59,11 @@
                         <form:errors path="receiverPhone" cssClass="invalid-feedback d-block"/>
                     </div>
                     <div class="col-12">
-                        <label class="form-label" for="deliveryAddress">Địa chỉ giao hàng</label>
-                        <form:textarea path="deliveryAddress" rows="2" cssClass="form-control" cssErrorClass="form-control is-invalid" maxlength="255"/>
+                        <label class="form-label" for="deliveryAddress">Địa chỉ giao hàng chính xác <span class="text-danger">*</span></label>
+                        <form:textarea path="deliveryAddress" rows="2" cssClass="form-control" cssErrorClass="form-control is-invalid" maxlength="255"
+                                       placeholder="Ví dụ: 12 Lê Văn Việt, phường Tăng Nhơn Phú A, TP. Thủ Đức, TP.HCM"/>
                         <form:errors path="deliveryAddress" cssClass="invalid-feedback d-block"/>
+                        <div class="form-text">Vui lòng ghi đủ số nhà, tên đường, phường/xã và tỉnh/thành phố để shipper giao đúng nơi.</div>
                     </div>
                     <div class="col-12">
                         <label class="form-label" for="note">Ghi chú đơn hàng</label>

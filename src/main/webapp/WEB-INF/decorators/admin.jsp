@@ -24,9 +24,8 @@
             <li class="nav-item"><a class="nav-link text-white" href="<c:url value='/admin/toppings'/>">Topping</a></li>
             <li class="nav-item"><a class="nav-link text-white" href="<c:url value='/admin/orders'/>">Đơn hàng</a></li>
             <li class="nav-item"><a class="nav-link text-white" href="<c:url value='/admin/feedback'/>">Ý kiến khách hàng</a></li>
-            <li class="nav-item"><a class="nav-link text-white-50 disabled" href="#">Chi nhánh</a></li>
-            <li class="nav-item"><a class="nav-link text-white-50 disabled" href="#">Người dùng / Nhân viên</a></li>
-            <li class="nav-item"><a class="nav-link text-white-50 disabled" href="#">Hỗ trợ khách (chat)</a></li>
+            <li class="nav-item"><a class="nav-link text-white" href="<c:url value='/admin/branches'/>">Chi nhánh</a></li>
+            <li class="nav-item"><a class="nav-link text-white" href="<c:url value='/admin/users'/>">Người dùng / Nhân viên</a></li>
         </ul>
         <hr>
         <a class="nav-link text-white-50 px-0" href="<c:url value='/'/>">← Về trang web</a>
@@ -38,10 +37,14 @@
     </aside>
 
     <div class="flex-grow-1 p-4">
+        <div class="d-flex justify-content-end mb-2">
+            <%@ include file="/WEB-INF/views/fragments/notification-center.jspf" %>
+        </div>
         <sitemesh:write property='body'/>
     </div>
 </div>
 
 <script src="<c:url value='/webjars/bootstrap/5.3.3/js/bootstrap.bundle.min.js'/>"></script>
+<script src="<c:url value='/js/notifications.js'/>"></script>
 </body>
 </html>
