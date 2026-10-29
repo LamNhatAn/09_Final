@@ -22,3 +22,11 @@ vnpay.hash-secret=KHOA_BI_MAT_SANDBOX
 # Localhost chi nhan Return URL trong trinh duyet. IPN production can URL HTTPS cong khai:
 # https://ten-mien-cua-ban/payments/vnpay/ipn
 vnpay.return-url=http://localhost:8080/payments/vnpay/return
+
+# Email gui OTP dang ky va dat lai mat khau. Voi Gmail, MAIL_PASSWORD la App Password 16 ky tu, khong phai mat khau dang nhap.
+MAIL_HOST=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USERNAME=your_email@gmail.com
+MAIL_PASSWORD=YOUR_16_CHARACTER_APP_PASSWORD
+# De trong de dung MAIL_USERNAME lam dia chi gui.
+MAIL_FROM=

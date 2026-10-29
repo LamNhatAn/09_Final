@@ -71,6 +71,7 @@
                         <td class="text-end"><fmt:formatNumber value="${p.basePrice}" type="number" groupingUsed="true"/> đ</td>
                         <td>
                             <c:choose>
+                                <c:when test="${p.available and p.soldOut}"><span class="badge text-bg-danger">Tạm hết</span></c:when>
                                 <c:when test="${p.available}"><span class="badge text-bg-success">Đang bán</span></c:when>
                                 <c:otherwise><span class="badge text-bg-secondary">Ngừng bán</span></c:otherwise>
                             </c:choose>

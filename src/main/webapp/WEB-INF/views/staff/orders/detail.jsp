@@ -19,14 +19,22 @@
     </div>
     <div class="d-flex align-items-center gap-2">
         <span class="badge fs-6 ${detail.order.status.badgeClass}"><c:out value="${detail.order.status.label}"/></span>
-        <c:if test="${detail.advanceable}">
-            <form method="post" action="<c:url value='/staff/orders/${detail.order.code}/advance'/>">
-                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}">
-                <button class="btn btn-success" type="submit" onclick="return confirm('Chuyển đơn sang trạng thái tiếp theo?');">
-                    Chuyển sang <c:out value="${detail.nextStatus.label}"/>
-                </button>
-            </form>
-        </c:if>
+        <c:choose>
+            <c:when test="${detail.order.status == 'PENDING'}">
+                <form method="post" action="<c:url value='/staff/orders/${detail.order.code}/accept'/>">
+                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}">
+                    <button class="btn btn-success" type="submit">Nhận đơn &amp; bắt đầu pha chế</button>
+                </form>
+            </c:when>
+            <c:when test="${detail.advanceable}">
+                <form method="post" action="<c:url value='/staff/orders/${detail.order.code}/advance'/>">
+                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}">
+                    <button class="btn btn-success" type="submit">
+                        Chuyển sang <c:out value="${detail.nextStatus.label}"/>
+                    </button>
+                </form>
+            </c:when>
+        </c:choose>
     </div>
 </div>
 

@@ -10,5 +10,13 @@ public interface BranchRepository extends JpaRepository<Branch, Long> {
 
     List<Branch> findByActiveTrueOrderByIdAsc();
 
+    List<Branch> findAllByOrderByIdAsc();
+
     Optional<Branch> findByIdAndActiveTrue(Long id);
+
+    long countByActiveTrue();
+
+    boolean existsByNameIgnoreCase(String name);
+
+    boolean existsByNameIgnoreCaseAndIdNot(String name, Long id);
 }

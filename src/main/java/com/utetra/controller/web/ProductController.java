@@ -26,7 +26,8 @@ public class ProductController {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Khong tim thay san pham"));
         model.addAttribute("product", product);
         model.addAttribute("sizes", catalogService.sizes());
-        model.addAttribute("toppings", catalogService.availableToppings());
+        model.addAttribute("toppings", product.getCategory().isAllowToppings()
+                ? catalogService.availableToppings() : java.util.List.of());
         model.addAttribute("related", catalogService.relatedProducts(product, 4));
         AddCartItemForm form = new AddCartItemForm();
         form.setProductId(product.getId());

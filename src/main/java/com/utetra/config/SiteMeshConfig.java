@@ -24,7 +24,9 @@ public class SiteMeshConfig {
                    .addExcludedPath("/webjars/*")
                    .addExcludedPath("/css/*")
                    .addExcludedPath("/js/*")
-                   .addExcludedPath("/images/*");
+                   .addExcludedPath("/images/*")
+                   .addExcludedPath("/api/*")
+                   .addExcludedPath("/ws*");
         }
     }
 

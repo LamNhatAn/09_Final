@@ -1,6 +1,6 @@
 ﻿/* =====================================================================
    UTETra - schema.sql  (SQL Server)
-   Tao database + 17 bang. Chay lai file nay se XOA va TAO LAI toan bo bang.
+   Tao database + 20 bang. Chay lai file nay se XOA va TAO LAI toan bo bang.
    Chay:  sqlcmd -S localhost -E -C -f 65001 -i database\schema.sql
    ===================================================================== */
 IF DB_ID(N'utetra') IS NULL
@@ -17,6 +17,9 @@ GO
 /* ---------- Xoa bang cu (theo thu tu phu thuoc) ---------- */
 DROP TABLE IF EXISTS chat_messages;
 DROP TABLE IF EXISTS chat_conversations;
+DROP TABLE IF EXISTS notifications;
+DROP TABLE IF EXISTS registration_otps;
+DROP TABLE IF EXISTS password_reset_otps;
 DROP TABLE IF EXISTS feedbacks;
 DROP TABLE IF EXISTS payments;
 DROP TABLE IF EXISTS order_status_history;
@@ -62,12 +65,46 @@ CREATE TABLE users (
     CONSTRAINT fk_users_branch FOREIGN KEY (branch_id) REFERENCES branches(id)
 );
 
+/* ---------- OTP xac minh email khi dang ky ---------- */
+CREATE TABLE registration_otps (
+    id                   BIGINT IDENTITY(1,1) PRIMARY KEY,
+    email                NVARCHAR(150) NOT NULL,
+    full_name            NVARCHAR(100) NOT NULL,
+    phone                NVARCHAR(20)  NULL,
+    password_hash        NVARCHAR(100) NOT NULL,
+    otp_hash             NVARCHAR(100) NOT NULL,
+    attempts             INT           NOT NULL DEFAULT 0,
+    expires_at           DATETIME2     NOT NULL,
+    resend_available_at  DATETIME2     NOT NULL,
+    created_at           DATETIME2     NOT NULL DEFAULT SYSDATETIME(),
+    updated_at           DATETIME2     NOT NULL DEFAULT SYSDATETIME(),
+    CONSTRAINT uq_registration_otps_email UNIQUE (email),
+    CONSTRAINT ck_registration_otps_attempts CHECK (attempts >= 0)
+);
+
+/* ---------- OTP dat lai mat khau ---------- */
+CREATE TABLE password_reset_otps (
+    id                   BIGINT IDENTITY(1,1) PRIMARY KEY,
+    email                NVARCHAR(150) NOT NULL,
+    otp_hash             NVARCHAR(100) NOT NULL,
+    attempts             INT           NOT NULL DEFAULT 0,
+    expires_at           DATETIME2     NOT NULL,
+    resend_available_at  DATETIME2     NOT NULL,
+    created_at           DATETIME2     NOT NULL DEFAULT SYSDATETIME(),
+    updated_at           DATETIME2     NOT NULL DEFAULT SYSDATETIME(),
+    CONSTRAINT uq_password_reset_otps_email UNIQUE (email),
+    CONSTRAINT ck_password_reset_otps_attempts CHECK (attempts >= 0)
+);
+CREATE INDEX ix_registration_otps_expires ON registration_otps(expires_at);
+CREATE INDEX ix_password_reset_otps_expires ON password_reset_otps(expires_at);
+
 /* ---------- Danh muc / San pham / Size / Topping ---------- */
 CREATE TABLE categories (
     id           BIGINT IDENTITY(1,1) PRIMARY KEY,
     name         NVARCHAR(100) NOT NULL,
     description  NVARCHAR(500) NULL,
     active       BIT           NOT NULL DEFAULT 1,
+    allow_toppings BIT         NOT NULL DEFAULT 0,
     CONSTRAINT uq_categories_name UNIQUE (name)
 );
 
@@ -80,6 +117,7 @@ CREATE TABLE products (
     image_url        NVARCHAR(500)  NULL,     -- URL anh tren Cloudinary
     image_public_id  NVARCHAR(200)  NULL,     -- public_id de xoa / ghi de anh
     available        BIT            NOT NULL DEFAULT 1,
+    sold_out         BIT            NOT NULL DEFAULT 0,
     created_at       DATETIME2      NOT NULL DEFAULT SYSDATETIME(),
     CONSTRAINT fk_products_category FOREIGN KEY (category_id) REFERENCES categories(id),
     CONSTRAINT ck_products_price CHECK (base_price >= 0)
@@ -260,7 +298,25 @@ CREATE TABLE feedbacks (
     CONSTRAINT ck_feedback_consent CHECK (privacy_consent = 1)
 );
 CREATE INDEX ix_feedback_created ON feedbacks(created_at DESC);
+
+/* ---------- Thong bao realtime ---------- */
+CREATE TABLE notifications (
+    id          BIGINT IDENTITY(1,1) PRIMARY KEY,
+    user_id     BIGINT         NOT NULL,
+    event_key   NVARCHAR(100)  NOT NULL,
+    type        NVARCHAR(30)   NOT NULL,
+    title       NVARCHAR(150)  NOT NULL,
+    message     NVARCHAR(500)  NOT NULL,
+    link        NVARCHAR(255)  NOT NULL,
+    read_at     DATETIME2      NULL,
+    created_at  DATETIME2      NOT NULL DEFAULT SYSDATETIME(),
+    CONSTRAINT fk_notifications_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    CONSTRAINT uq_notifications_user_event UNIQUE (user_id, event_key),
+    CONSTRAINT ck_notifications_type CHECK (type IN ('NEW_ORDER','ORDER_STATUS'))
+);
+CREATE INDEX ix_notifications_user_created ON notifications(user_id, created_at DESC);
+CREATE INDEX ix_notifications_user_unread ON notifications(user_id, read_at);
 GO
 
-PRINT N'schema.sql: da tao xong 17 bang.';
+PRINT N'schema.sql: da tao xong 19 bang.';
 GO

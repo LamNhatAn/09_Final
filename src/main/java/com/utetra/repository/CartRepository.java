@@ -17,7 +17,6 @@ public interface CartRepository extends JpaRepository<Cart, Long> {
             left join fetch i.product p
             left join fetch p.category
             left join fetch i.size
-            left join fetch i.toppings
             where c.user.id = :userId
             """)
     Optional<Cart> findDetailedByUserId(@Param("userId") Long userId);

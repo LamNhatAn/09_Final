@@ -3,13 +3,17 @@ package com.utetra.service;
 import com.utetra.dto.VnpayCallbackOutcome;
 import com.utetra.entity.Order;
 import com.utetra.entity.Payment;
+import com.utetra.entity.Branch;
+import com.utetra.entity.User;
 import com.utetra.entity.enums.OrderStatus;
 import com.utetra.entity.enums.PaymentMethod;
 import com.utetra.entity.enums.PaymentStatus;
+import com.utetra.event.OrderNotificationEvent;
 import com.utetra.repository.OrderRepository;
 import com.utetra.repository.PaymentRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.context.ApplicationEventPublisher;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
@@ -30,6 +34,7 @@ class VnpayPaymentServiceTest {
     private VnpayGateway gateway;
     private PaymentRepository paymentRepository;
     private OrderRepository orderRepository;
+    private ApplicationEventPublisher eventPublisher;
     private VnpayPaymentService service;
 
     @BeforeEach
@@ -37,7 +42,8 @@ class VnpayPaymentServiceTest {
         gateway = mock(VnpayGateway.class);
         paymentRepository = mock(PaymentRepository.class);
         orderRepository = mock(OrderRepository.class);
-        service = new VnpayPaymentService(gateway, paymentRepository, orderRepository);
+        eventPublisher = mock(ApplicationEventPublisher.class);
+        service = new VnpayPaymentService(gateway, paymentRepository, orderRepository, eventPublisher);
         when(gateway.hasValidSignature(anyMap())).thenReturn(true);
         when(gateway.hasExpectedMerchant(anyMap())).thenReturn(true);
     }
@@ -55,6 +61,7 @@ class VnpayPaymentServiceTest {
         assertEquals("998877", payment.getVnpTransactionNo());
         verify(paymentRepository).save(payment);
         verify(orderRepository).save(payment.getOrder());
+        verify(eventPublisher).publishEvent(any(OrderNotificationEvent.class));
     }
 
     @Test
@@ -67,6 +74,7 @@ class VnpayPaymentServiceTest {
         assertEquals(VnpayCallbackOutcome.Type.PROCESSED, result.getType());
         assertEquals(PaymentStatus.FAILED, payment.getStatus());
         assertEquals(PaymentStatus.FAILED, payment.getOrder().getPaymentStatus());
+        verify(eventPublisher, never()).publishEvent(any(OrderNotificationEvent.class));
     }
 
     @Test
@@ -144,6 +152,12 @@ class VnpayPaymentServiceTest {
         order.setPaymentMethod(PaymentMethod.VNPAY);
         order.setPaymentStatus(PaymentStatus.UNPAID);
         order.setTotalAmount(new BigDecimal("35000"));
+        Branch branch = new Branch();
+        branch.setId(3L);
+        order.setBranch(branch);
+        User user = new User();
+        user.setId(7L);
+        order.setUser(user);
         return order;
     }
 

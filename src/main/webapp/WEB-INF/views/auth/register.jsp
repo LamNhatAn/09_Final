@@ -1,6 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8" session="false" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <html>
 <head>
     <title>Đăng ký</title>
@@ -11,6 +12,13 @@
         <div class="card shadow-sm">
             <div class="card-body p-4">
                 <h1 class="h4 mb-3 text-center">Tạo tài khoản</h1>
+                <p class="text-muted text-center">Bạn sẽ cần nhập mã OTP được gửi tới email để hoàn tất đăng ký.</p>
+
+                <spring:hasBindErrors name="registerForm">
+                    <c:forEach items="${errors.globalErrors}" var="err">
+                        <div class="alert alert-danger"><c:out value="${err.defaultMessage}"/></div>
+                    </c:forEach>
+                </spring:hasBindErrors>
 
                 <form:form method="post" action="${pageContext.request.contextPath}/register" modelAttribute="registerForm" novalidate="novalidate">
                     <div class="mb-3">
@@ -39,7 +47,7 @@
                         <form:password path="confirmPassword" cssClass="form-control" cssErrorClass="form-control is-invalid" autocomplete="new-password"/>
                         <form:errors path="confirmPassword" cssClass="invalid-feedback d-block"/>
                     </div>
-                    <button type="submit" class="btn btn-success w-100">Đăng ký</button>
+                    <button type="submit" class="btn btn-success w-100">Gửi mã OTP</button>
                 </form:form>
 
                 <p class="text-center mt-3 mb-0">

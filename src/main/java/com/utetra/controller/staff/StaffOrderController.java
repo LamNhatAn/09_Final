@@ -1,6 +1,7 @@
 package com.utetra.controller.staff;
 
 import com.utetra.dto.AdminOrderDetail;
+import com.utetra.entity.Order;
 import com.utetra.entity.enums.OrderStatus;
 import com.utetra.security.AppUserDetails;
 import com.utetra.service.StaffOrderException;
@@ -18,6 +19,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 @Controller
 @RequestMapping("/staff/orders")
@@ -29,19 +33,50 @@ public class StaffOrderController {
 
     @GetMapping
     public String list(@AuthenticationPrincipal AppUserDetails staff,
-                       @RequestParam(required = false) OrderStatus status,
                        @RequestParam(defaultValue = "") String q,
-                       @RequestParam(defaultValue = "1") int page,
+                       @RequestParam(required = false) String ok,
+                       @RequestParam(required = false) String err,
                        Model model) {
         if (staff.isAdmin()) {
             return "redirect:/admin/orders";
         }
-        model.addAttribute("orders", orderService.list(staff.getBranchId(), status, q, page));
-        model.addAttribute("statuses", OrderStatus.values());
-        model.addAttribute("selectedStatus", status);
-        model.addAttribute("q", q == null ? "" : q.trim());
+        String keyword = q == null ? "" : q.trim();
+        model.addAttribute("orders", orderService.workQueue(staff.getBranchId(), OrderStatus.PENDING, keyword));
+        model.addAttribute("q", keyword);
         model.addAttribute("dateTimeFormatter", DATE_TIME);
+        model.addAttribute("okMessage", "accepted".equals(ok)
+                ? "Đã nhận đơn và chuyển sang khu vực đang pha chế." : null);
+        model.addAttribute("errMessage", "cannot-accept".equals(err)
+                ? "Đơn không còn ở hàng chờ hoặc chưa đủ điều kiện để nhận." : null);
         return "staff/orders/list";
+    }
+
+    @GetMapping("/processing")
+    public String processing(@AuthenticationPrincipal AppUserDetails staff,
+                             @RequestParam(defaultValue = "") String q,
+                             @RequestParam(required = false) String ok,
+                             @RequestParam(required = false) String err,
+                             Model model) {
+        if (staff.isAdmin()) {
+            return "redirect:/admin/orders";
+        }
+        String keyword = q == null ? "" : q.trim();
+        List<Order> preparingOrders = new ArrayList<>(
+                orderService.workQueue(staff.getBranchId(), OrderStatus.CONFIRMED, keyword));
+        preparingOrders.addAll(orderService.workQueue(staff.getBranchId(), OrderStatus.PREPARING, keyword));
+        preparingOrders.sort(Comparator.comparing(Order::getCreatedAt).thenComparing(Order::getId));
+
+        model.addAttribute("preparingOrders", preparingOrders);
+        model.addAttribute("deliveringOrders",
+                orderService.workQueue(staff.getBranchId(), OrderStatus.DELIVERING, keyword));
+        model.addAttribute("q", keyword);
+        model.addAttribute("dateTimeFormatter", DATE_TIME);
+        model.addAttribute("okMessage", "accepted".equals(ok)
+                ? "Đã nhận đơn. Đơn đang chờ pha chế."
+                : ("advanced".equals(ok) ? "Đơn hàng đã được chuyển sang bước tiếp theo." : null));
+        model.addAttribute("errMessage", "cannot-advance".equals(err)
+                ? "Không thể chuyển tiếp trạng thái của đơn này." : null);
+        return "staff/orders/processing";
     }
 
     @GetMapping("/{code:[A-Za-z0-9-]+}")
@@ -66,17 +101,35 @@ public class StaffOrderController {
         }
     }
 
-    @PostMapping("/{code:[A-Za-z0-9-]+}/advance")
-    public String advance(@AuthenticationPrincipal AppUserDetails staff,
-                          @PathVariable String code) {
+    @PostMapping("/{code:[A-Za-z0-9-]+}/accept")
+    public String accept(@AuthenticationPrincipal AppUserDetails staff,
+                         @PathVariable String code) {
         if (staff.isAdmin()) {
             return "redirect:/admin/orders/" + code;
         }
         try {
-            orderService.advance(staff.getId(), staff.getBranchId(), code);
-            return "redirect:/staff/orders/" + code + "?ok=advanced";
+            orderService.acceptForPreparation(staff.getId(), staff.getBranchId(), code);
+            return "redirect:/staff/orders/processing?ok=accepted";
         } catch (StaffOrderException e) {
-            return "redirect:/staff/orders/" + code + "?err=cannot-advance";
+            return "redirect:/staff/orders?err=cannot-accept";
+        }
+    }
+
+    @PostMapping("/{code:[A-Za-z0-9-]+}/advance")
+    public String advance(@AuthenticationPrincipal AppUserDetails staff,
+                          @PathVariable String code,
+                          @RequestParam(defaultValue = "detail") String returnTo) {
+        if (staff.isAdmin()) {
+            return "redirect:/admin/orders/" + code;
+        }
+        String destination = "processing".equals(returnTo)
+                ? "redirect:/staff/orders/processing"
+                : "redirect:/staff/orders/" + code;
+        try {
+            orderService.advance(staff.getId(), staff.getBranchId(), code);
+            return destination + "?ok=advanced";
+        } catch (StaffOrderException e) {
+            return destination + "?err=cannot-advance";
         }
     }
 }

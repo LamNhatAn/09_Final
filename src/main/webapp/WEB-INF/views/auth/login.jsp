@@ -19,6 +19,9 @@
                 <c:if test="${param.logout != null}">
                     <div class="alert alert-info">Bạn đã đăng xuất.</div>
                 </c:if>
+                <c:if test="${param['password-reset'] != null}">
+                    <div class="alert alert-success">Đổi mật khẩu thành công! Bạn có thể đăng nhập bằng mật khẩu mới.</div>
+                </c:if>
                 <spring:hasBindErrors name="loginForm">
                     <c:forEach items="${errors.globalErrors}" var="err">
                         <div class="alert alert-danger"><c:out value="${err.defaultMessage}"/></div>
@@ -36,6 +39,7 @@
                         <label class="form-label" for="password">Mật khẩu</label>
                         <form:password path="password" cssClass="form-control" cssErrorClass="form-control is-invalid" autocomplete="current-password"/>
                         <form:errors path="password" cssClass="invalid-feedback d-block"/>
+                        <div class="text-end mt-1"><a class="small" href="<c:url value='/forgot-password'/>">Quên mật khẩu?</a></div>
                     </div>
                     <button type="submit" class="btn btn-success w-100">Đăng nhập</button>
                 </form:form>

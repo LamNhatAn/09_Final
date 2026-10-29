@@ -52,9 +52,15 @@ public class CartService {
 
         Product product = productRepository.findPublicById(form.getProductId())
                 .orElseThrow(() -> new CartException("Sản phẩm không còn bán"));
+        if (product.isSoldOut()) {
+            throw new CartException("Món đang tạm hết");
+        }
         Size size = sizeRepository.findById(form.getSizeId())
                 .orElseThrow(() -> new CartException("Kích cỡ không hợp lệ"));
         Set<Long> toppingIds = new HashSet<>(form.getToppingIds() == null ? List.of() : form.getToppingIds());
+        if (!product.getCategory().isAllowToppings() && !toppingIds.isEmpty()) {
+            throw new CartException("Món này không áp dụng topping");
+        }
         List<Topping> toppings = toppingIds.isEmpty()
                 ? List.of() : toppingRepository.findByIdInAndAvailableTrue(toppingIds);
         if (toppings.size() != toppingIds.size()) {
@@ -110,7 +116,9 @@ public class CartService {
     }
 
     public static CartView toView(Cart cart) {
-        List<CartLine> lines = cart.getItems().stream().map(item -> {
+        // Hibernate có thể lặp cùng CartItem khi JOIN FETCH quan hệ nhiều-nhiều topping.
+        // distinct theo entity trước khi tính tiền để một ly không bị nhân theo số topping.
+        List<CartLine> lines = cart.getItems().stream().distinct().map(item -> {
             BigDecimal unitPrice = unitPrice(item);
             return new CartLine(item, unitPrice, unitPrice.multiply(BigDecimal.valueOf(item.getQuantity())));
         }).toList();

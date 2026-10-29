@@ -17,4 +17,5 @@ public class CategoryForm {
     private String description;
 
     private boolean active = true;
+
 }

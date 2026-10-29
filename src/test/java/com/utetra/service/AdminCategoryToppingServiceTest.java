@@ -56,6 +56,18 @@ class AdminCategoryToppingServiceTest {
         assertEquals("Tra moi", c.getName());
         assertNull(c.getDescription());
         assertFalse(c.isActive());
+        assertFalse(c.isAllowToppings());
+    }
+
+    @Test
+    void onlyMilkTeaCategoryAutomaticallyAllowsToppings() {
+        when(categoryRepository.save(any(Category.class))).thenAnswer(i -> i.getArgument(0));
+        CategoryForm form = categoryForm();
+        form.setName(" Trà sữa ");
+
+        Category category = categoryService.create(form);
+
+        assertTrue(category.isAllowToppings());
     }
 
     @Test

@@ -38,6 +38,7 @@
                                 </div>
                                 <div class="col-9 col-md-5">
                                     <h2 class="h6 mb-1"><c:out value="${line.item.product.name}"/></h2>
+                                    <c:if test="${line.item.product.soldOut}"><span class="badge text-bg-danger mb-1">Đã hết – vui lòng xóa khỏi giỏ</span></c:if>
                                     <div class="small text-muted">
                                         Size <c:out value="${line.item.size.name}"/> · Đường ${line.item.sugarPercent}% · Đá ${line.item.icePercent}%
                                     </div>
@@ -80,7 +81,7 @@
                     <div class="d-flex justify-content-between mb-2"><span>Số lượng</span><strong>${cart.totalQuantity} ly</strong></div>
                     <div class="d-flex justify-content-between h5 border-top pt-3"><span>Tạm tính</span><strong class="product-price"><fmt:formatNumber value="${cart.subtotal}" type="number"/> đ</strong></div>
                     <p class="small text-muted">Thanh toán khi nhận hàng (COD).</p>
-                    <a class="btn btn-utetra w-100" href="<c:url value='/checkout'/>">Tiến hành đặt hàng</a>
+                    <c:choose><c:when test="${cart.soldOutItemPresent}"><div class="alert alert-warning small">Giỏ hàng có món đã hết. Vui lòng xóa hoặc chọn món khác trước khi đặt hàng.</div><a class="btn btn-outline-secondary w-100" href="<c:url value='/menu'/>">Chọn món khác</a></c:when><c:otherwise><a class="btn btn-utetra w-100" href="<c:url value='/checkout'/>">Tiến hành đặt hàng</a></c:otherwise></c:choose>
                 </div></div>
             </div>
         </div>

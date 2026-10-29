@@ -18,9 +18,11 @@
             🧋 UTETra <span class="badge bg-light text-dark">Nhân viên</span>
         </a>
         <ul class="navbar-nav flex-row gap-3 me-auto ms-3">
-            <li class="nav-item"><a class="nav-link" href="<c:url value='/staff/orders'/>">Đơn hàng</a></li>
-            <li class="nav-item"><a class="nav-link disabled" href="#">Chat với khách</a></li>
+            <li class="nav-item"><a class="nav-link" href="<c:url value='/staff/orders'/>">Đơn mới cần nhận</a></li>
+            <li class="nav-item"><a class="nav-link" href="<c:url value='/staff/orders/processing'/>">Pha chế / giao</a></li>
+            <li class="nav-item"><a class="nav-link" href="<c:url value='/staff/products'/>">Tình trạng món</a></li>
         </ul>
+        <div class="me-3"><%@ include file="/WEB-INF/views/fragments/notification-center.jspf" %></div>
         <a class="nav-link text-white-50" href="<c:url value='/'/>">Về trang web</a>
         <span class="navbar-text text-white mx-3">👤 <c:out value="${currentUser.fullName}"/></span>
         <form method="post" action="<c:url value='/logout'/>" class="m-0">
@@ -35,5 +37,6 @@
 </main>
 
 <script src="<c:url value='/webjars/bootstrap/5.3.3/js/bootstrap.bundle.min.js'/>"></script>
+<script src="<c:url value='/js/notifications.js'/>"></script>
 </body>
 </html>

@@ -4,7 +4,8 @@
 <%-- Dung bang <%@ include %> ben trong c:forEach var="p" (cung page scope nen thay duoc bien p) --%>
 <fmt:setLocale value="vi_VN"/>
 <div class="col">
-    <div class="card h-100 shadow-sm product-card">
+    <div class="card h-100 shadow-sm product-card ${p.soldOut ? 'product-sold-out' : ''}">
+        <c:if test="${p.soldOut}"><span class="badge text-bg-danger product-sold-out-badge">Đã hết</span></c:if>
         <a href="<c:url value='/products/${p.id}'/>" class="text-decoration-none">
             <c:choose>
                 <c:when test="${not empty p.imageUrl}">
@@ -24,6 +25,7 @@
             <div class="mt-auto fw-bold product-price">
                 <fmt:formatNumber value="${p.basePrice}" type="number" groupingUsed="true"/> đ
             </div>
+            <c:if test="${p.soldOut}"><div class="small text-danger fw-semibold mt-1">Món đang tạm hết</div></c:if>
         </div>
     </div>
 </div>

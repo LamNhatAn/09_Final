@@ -70,6 +70,25 @@ class CartServiceTest {
     }
 
     @Test
+    void toViewDoesNotMultiplyOneDrinkByNumberOfJoinedToppings() {
+        Cart cart = new Cart();
+        CartItem item = item(1, Set.of(
+                topping(1L, "Trân châu", "5000"),
+                topping(2L, "Pudding", "7000"),
+                topping(3L, "Thạch", "5000")));
+        // Mô phỏng kết quả JOIN FETCH: cùng một entity xuất hiện một lần cho mỗi topping.
+        cart.getItems().add(item);
+        cart.getItems().add(item);
+        cart.getItems().add(item);
+
+        CartView view = CartService.toView(cart);
+
+        assertEquals(1, view.lines().size());
+        assertEquals(1, view.totalQuantity());
+        assertEquals(new BigDecimal("57000"), view.subtotal());
+    }
+
+    @Test
     void addCreatesCartAndNormalizesNote() {
         AddCartItemForm form = form();
         form.setNote("  ít ngọt  ");
@@ -127,6 +146,33 @@ class CartServiceTest {
     }
 
     @Test
+    void addRejectsSoldOutProduct() {
+        Product product = product();
+        product.setSoldOut(true);
+        when(productRepository.findPublicById(1L)).thenReturn(Optional.of(product));
+
+        assertThrows(CartException.class, () -> service.add(7L, form()));
+
+        verify(sizeRepository, never()).findById(any());
+        verify(cartRepository, never()).save(any());
+    }
+
+    @Test
+    void addRejectsToppingForNonMilkTeaCategory() {
+        Product product = product();
+        product.getCategory().setAllowToppings(false);
+        AddCartItemForm form = form();
+        form.setToppingIds(List.of(1L));
+        when(productRepository.findPublicById(1L)).thenReturn(Optional.of(product));
+        when(sizeRepository.findById(1L)).thenReturn(Optional.of(size()));
+
+        assertThrows(CartException.class, () -> service.add(7L, form));
+
+        verify(toppingRepository, never()).findByIdInAndAvailableTrue(any());
+        verify(cartRepository, never()).save(any());
+    }
+
+    @Test
     void updateQuantityChecksOwnershipAndLimit() {
         assertThrows(CartException.class, () -> service.updateQuantity(7L, 9L, 21));
         when(cartItemRepository.findOwnedDetailed(9L, 7L)).thenReturn(Optional.empty());
@@ -169,6 +215,7 @@ class CartServiceTest {
         Category category = new Category();
         category.setId(1L);
         category.setActive(true);
+        category.setAllowToppings(true);
         Product product = new Product();
         product.setId(1L);
         product.setName("Trà sữa");

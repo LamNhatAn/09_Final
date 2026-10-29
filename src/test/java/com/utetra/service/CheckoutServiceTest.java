@@ -14,6 +14,7 @@ import com.utetra.entity.User;
 import com.utetra.entity.enums.OrderStatus;
 import com.utetra.entity.enums.PaymentMethod;
 import com.utetra.entity.enums.PaymentStatus;
+import com.utetra.event.OrderNotificationEvent;
 import com.utetra.repository.BranchRepository;
 import com.utetra.repository.CartRepository;
 import com.utetra.repository.OrderRepository;
@@ -23,6 +24,7 @@ import com.utetra.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.springframework.context.ApplicationEventPublisher;
 
 import java.math.BigDecimal;
 import java.util.Optional;
@@ -45,6 +47,7 @@ class CheckoutServiceTest {
     private OrderRepository orderRepository;
     private OrderStatusHistoryRepository historyRepository;
     private PaymentRepository paymentRepository;
+    private ApplicationEventPublisher eventPublisher;
     private CheckoutService service;
 
     @BeforeEach
@@ -55,9 +58,14 @@ class CheckoutServiceTest {
         orderRepository = mock(OrderRepository.class);
         historyRepository = mock(OrderStatusHistoryRepository.class);
         paymentRepository = mock(PaymentRepository.class);
+        eventPublisher = mock(ApplicationEventPublisher.class);
         service = new CheckoutService(cartRepository, userRepository, branchRepository,
-                orderRepository, historyRepository, paymentRepository);
-        when(orderRepository.save(any(Order.class))).thenAnswer(i -> i.getArgument(0));
+                orderRepository, historyRepository, paymentRepository, eventPublisher);
+        when(orderRepository.save(any(Order.class))).thenAnswer(i -> {
+            Order order = i.getArgument(0);
+            order.setId(10L);
+            return order;
+        });
     }
 
     @Test
@@ -83,6 +91,7 @@ class CheckoutServiceTest {
         assertTrue(order.getCode().startsWith("UTE-"));
         assertTrue(cart.getItems().isEmpty());
         verify(historyRepository).save(any());
+        verify(eventPublisher).publishEvent(any(OrderNotificationEvent.class));
     }
 
     @Test
@@ -115,6 +124,7 @@ class CheckoutServiceTest {
         assertEquals(PaymentStatus.UNPAID, captor.getValue().getStatus());
         assertEquals(new BigDecimal("90000"), captor.getValue().getAmount());
         assertTrue(cart.getItems().isEmpty());
+        verify(eventPublisher, never()).publishEvent(any(OrderNotificationEvent.class));
     }
 
     @Test
@@ -126,6 +136,32 @@ class CheckoutServiceTest {
         when(cartRepository.findDetailedByUserId(7L)).thenReturn(Optional.of(cart));
 
         assertThrows(CheckoutException.class, () -> service.placeCod(7L, form()));
+        verify(orderRepository, never()).save(any());
+    }
+
+    @Test
+    void placeCodRejectsSoldOutProductAlreadyInCart() {
+        Cart cart = cart();
+        cart.getItems().get(0).getProduct().setSoldOut(true);
+        when(userRepository.findById(7L)).thenReturn(Optional.of(activeUser()));
+        when(branchRepository.findByIdAndActiveTrue(2L)).thenReturn(Optional.of(activeBranch()));
+        when(cartRepository.findDetailedByUserId(7L)).thenReturn(Optional.of(cart));
+
+        assertThrows(CheckoutException.class, () -> service.placeCod(7L, form()));
+
+        verify(orderRepository, never()).save(any());
+    }
+
+    @Test
+    void placeCodRejectsLegacyToppingOnUnsupportedDrink() {
+        Cart cart = cart();
+        cart.getItems().get(0).getProduct().getCategory().setAllowToppings(false);
+        when(userRepository.findById(7L)).thenReturn(Optional.of(activeUser()));
+        when(branchRepository.findByIdAndActiveTrue(2L)).thenReturn(Optional.of(activeBranch()));
+        when(cartRepository.findDetailedByUserId(7L)).thenReturn(Optional.of(cart));
+
+        assertThrows(CheckoutException.class, () -> service.placeCod(7L, form()));
+
         verify(orderRepository, never()).save(any());
     }
 
@@ -181,6 +217,7 @@ class CheckoutServiceTest {
     private static Cart cart() {
         Category category = new Category();
         category.setActive(true);
+        category.setAllowToppings(true);
         Product product = new Product();
         product.setId(1L);
         product.setName("Trà sữa");

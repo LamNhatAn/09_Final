@@ -24,4 +24,8 @@ public class Category {
 
     @Column(nullable = false)
     private boolean active = true;
+
+    /** Chỉ danh mục đồ uống phù hợp mới được chọn topping. */
+    @Column(nullable = false)
+    private boolean allowToppings = false;
 }

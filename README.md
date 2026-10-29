@@ -1,7 +1,7 @@
 # UTETra - Website chuỗi trà sữa
 
-Spring Boot 3 (WAR) + JSP/JSTL + SiteMesh 3 + Bootstrap 5 + Spring Data JPA + SQL Server.
-Thanh toán: COD và VNPay (sandbox). Thông báo realtime và chat bằng WebSocket. Ảnh sản phẩm lưu trên Cloudinary.
+Spring Boot 3 (WAR) + JSP/JSTL + SiteMesh 3 + Bootstrap 5 + Spring Data JPA + SQL Server + WebSocket/STOMP.
+Thanh toán: COD và VNPay (sandbox). Thông báo realtime bằng WebSocket. Ảnh sản phẩm lưu trên Cloudinary.
 
 ## Yêu cầu cài đặt
 
@@ -52,6 +52,26 @@ Thanh toán: COD và VNPay (sandbox). Thông báo realtime và chat bằng WebSo
 
    Không commit `HashSecret`. Khi triển khai thật, đăng ký IPN HTTPS công khai trỏ tới `/payments/vnpay/ipn`. Nếu chưa cấu hình, lựa chọn VNPay trên checkout sẽ bị khóa nhưng COD vẫn hoạt động.
 
+6. **Email gửi OTP đăng ký:** với Gmail, bật xác minh 2 bước rồi tạo **App Password**; thêm vào `application-local.properties`:
+
+   ```properties
+   MAIL_HOST=smtp.gmail.com
+   MAIL_PORT=587
+   MAIL_USERNAME=your_email@gmail.com
+   MAIL_PASSWORD=APP_PASSWORD_16_KY_TU
+   MAIL_FROM=
+   ```
+
+   `MAIL_PASSWORD` không phải mật khẩu đăng nhập Gmail và tuyệt đối không được commit. Nếu chưa cấu hình, website vẫn chạy nhưng form đăng ký sẽ báo không gửi được OTP.
+
+   Với database đã tạo từ trước, chạy thêm một lần:
+
+   ```powershell
+   sqlcmd -S localhost -E -C -f 65001 -i database\day10-add-password-reset-otps.sql
+   sqlcmd -S localhost -E -C -f 65001 -i database\day10-add-product-sold-out.sql
+   sqlcmd -S localhost -E -C -f 65001 -i database\day10-add-category-topping-rule.sql
+   ```
+
 ## Chạy ứng dụng
 
 ```powershell
@@ -77,11 +97,16 @@ Chạy lệnh ở thư mục gốc dự án để ứng dụng đọc được `
 | http://localhost:8080/menu?category=3 | Chỉ 3 món cà phê |
 | http://localhost:8080/menu?q=tra sua | Tìm không dấu: ra 4 món trà sữa |
 | http://localhost:8080/products/1 | Chi tiết Trà sữa trân châu đen: giá 35.000 đ, size S/M/L, 6 topping, món cùng loại |
+| http://localhost:8080/products/5 | Trà trái cây: không hiển thị và không cho thêm topping |
 | http://localhost:8080/products/999 | Trang 404 có thanh menu |
 | http://localhost:8080/branches | 3 chi nhánh, giờ mở cửa, nhãn Đang mở/Đã đóng, link bản đồ |
 | http://localhost:8080/login | Form đăng nhập |
-| http://localhost:8080/register | Form đăng ký |
-| http://localhost:8080/admin/dashboard | Chưa đăng nhập: chuyển về `/login`. USER/STAFF: trang 403. ADMIN: trang quản trị |
+| http://localhost:8080/forgot-password | Gửi OTP email và đặt lại mật khẩu khách hàng |
+| http://localhost:8080/register | Form đăng ký; gửi OTP email trước khi tạo tài khoản |
+| http://localhost:8080/register/verify | Nhập OTP 6 số, gửi lại mã sau 60 giây |
+| http://localhost:8080/admin/dashboard | ADMIN: doanh thu, số đơn, khách hàng, nhân viên, chi nhánh và đơn mới nhất |
+| http://localhost:8080/admin/branches | ADMIN: thêm/sửa/kích hoạt/ngừng hoạt động chi nhánh |
+| http://localhost:8080/admin/users | ADMIN: tìm kiếm, tạo nhân viên, sửa, khóa/mở khóa tài khoản |
 | http://localhost:8080/admin/products | ADMIN: danh sách 12 sản phẩm, thêm/sửa/ẩn/xóa, upload ảnh Cloudinary |
 | http://localhost:8080/admin/categories | ADMIN: 4 danh mục kèm số sản phẩm, thêm/sửa/ẩn/xóa |
 | http://localhost:8080/admin/toppings | ADMIN: 6 topping, thêm/sửa/ẩn/xóa |
@@ -92,7 +117,9 @@ Chạy lệnh ở thư mục gốc dự án để ứng dụng đọc được `
 | http://localhost:8080/orders/{code} | USER: chi tiết, lịch sử trạng thái và hủy đơn còn chờ xác nhận |
 | http://localhost:8080/admin/orders | ADMIN: lọc/tìm toàn bộ đơn, xem chi tiết và chuyển trạng thái đúng quy trình |
 | http://localhost:8080/admin/feedback | ADMIN: xem ý kiến khách hàng mới nhất, số sao và thông tin liên hệ |
+| http://localhost:8080/api/notifications | Tài khoản đã đăng nhập: JSON gồm thông báo mới nhất và số chưa đọc |
 | http://localhost:8080/staff/orders | STAFF: chỉ xem, lọc, tìm và xử lý đơn thuộc chi nhánh được gán |
+| http://localhost:8080/staff/products | STAFF: đánh dấu món tạm hết hoặc mở bán lại; món hết vẫn hiện trên menu khách |
 | http://localhost:8080/staff/dashboard | STAFF/ADMIN: chuyển tới trang xử lý đơn; USER bị từ chối quyền |
 | http://localhost:8080/health | JSON `{"status":"UP","database":"utetra",...}` |
 
@@ -109,7 +136,7 @@ Các bước kiểm tra đăng nhập/phân quyền từng bước: xem [docs/03
 | user1@utetra.vn | USER | |
 | user2@utetra.vn | USER | |
 
-Đăng nhập tại `/login`. Tài khoản đăng ký mới luôn có vai trò USER; STAFF và ADMIN do quản trị tạo (Day 10).
+Đăng nhập tại `/login`. Tài khoản đăng ký mới chỉ được tạo sau khi xác minh OTP email và luôn có vai trò USER; STAFF và ADMIN do quản trị tạo.
 
 ## Cấu trúc thư mục
 
@@ -134,4 +161,8 @@ UTETra/
         └── views/         home.jsp, menu.jsp, product-detail.jsp, branches.jsp, fragments/, auth/, error/, admin/ (products/, categories/, toppings/), staff/
 ```
 
+Thông báo realtime và cách kiểm tra Day 10: xem [docs/10-realtime-notifications.md](docs/10-realtime-notifications.md).
+
 Xem thiết kế chi tiết tại [docs/01-analysis-design.md](docs/01-analysis-design.md).
+
+Danh mục hồ sơ nộp cuối kỳ, danh sách chức năng đầy đủ và hướng dẫn kiểm tra: xem [SUBMISSION.md](SUBMISSION.md).

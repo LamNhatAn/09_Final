@@ -2,73 +2,48 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <html>
-<head><title>Đơn hàng chi nhánh</title></head>
+<head><title>Đơn mới cần nhận</title></head>
 <body>
-<div class="mb-3">
-    <h1 class="h3 mb-1">Đơn hàng chi nhánh</h1>
-    <p class="text-muted mb-0">Theo dõi và cập nhật các đơn thuộc chi nhánh của bạn.</p>
+<div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-3">
+    <div>
+        <h1 class="h3 mb-1">Đơn mới cần nhận</h1>
+        <p class="text-muted mb-0">Chỉ hiển thị đơn chưa nhận, ưu tiên đơn được đặt trước.</p>
+    </div>
+    <form method="get" action="<c:url value='/staff/orders'/>" class="staff-order-search d-flex gap-2">
+        <label class="visually-hidden" for="q">Mã đơn hoặc số điện thoại</label>
+        <input class="form-control" id="q" name="q" value="<c:out value='${q}'/>" maxlength="100"
+               placeholder="Mã đơn hoặc số điện thoại">
+        <button class="btn btn-primary" type="submit">Tìm</button>
+        <c:if test="${not empty q}"><a class="btn btn-outline-secondary" href="<c:url value='/staff/orders'/>">Xóa</a></c:if>
+    </form>
 </div>
 
-<form method="get" action="<c:url value='/staff/orders'/>" class="card card-body border-0 shadow-sm mb-3">
-    <div class="row g-2 align-items-end">
-        <div class="col-md-4">
-            <label class="form-label" for="status">Trạng thái</label>
-            <select class="form-select" id="status" name="status">
-                <option value="">Tất cả trạng thái</option>
-                <c:forEach var="s" items="${statuses}">
-                    <option value="${s}" ${selectedStatus == s ? 'selected' : ''}><c:out value="${s.label}"/></option>
-                </c:forEach>
-            </select>
-        </div>
-        <div class="col-md-6">
-            <label class="form-label" for="q">Mã đơn hoặc số điện thoại</label>
-            <input class="form-control" id="q" name="q" value="<c:out value='${q}'/>" maxlength="100">
-        </div>
-        <div class="col-md-2 d-flex gap-2">
-            <button class="btn btn-primary" type="submit">Lọc</button>
-            <a class="btn btn-outline-secondary" href="<c:url value='/staff/orders'/>">Xóa lọc</a>
-        </div>
-    </div>
-</form>
+<nav class="nav nav-pills gap-2 mb-3" aria-label="Khu vực xử lý đơn">
+    <a class="nav-link active" href="<c:url value='/staff/orders'/>">Đơn mới cần nhận <span class="badge text-bg-light ms-1">${orders.size()}</span></a>
+    <a class="nav-link" href="<c:url value='/staff/orders/processing'/>">Đang pha chế / giao</a>
+</nav>
+
+<c:if test="${not empty okMessage}"><div class="alert alert-success py-2"><c:out value="${okMessage}"/></div></c:if>
+<c:if test="${not empty errMessage}"><div class="alert alert-danger py-2"><c:out value="${errMessage}"/></div></c:if>
+
+<div class="alert alert-info border-0">
+    Kiểm tra kỹ món, ghi chú và thông tin giao hàng. Nếu có vấn đề, hãy gọi, nhắn SMS hoặc gửi email cho khách trước khi nhận đơn.
+</div>
 
 <c:choose>
-    <c:when test="${empty orders.content}">
-        <div class="alert alert-light border">Không có đơn hàng phù hợp.</div>
+    <c:when test="${empty orders}">
+        <div class="card border-0 shadow-sm"><div class="card-body text-center text-muted py-5">Hiện không có đơn mới cần xác nhận.</div></div>
     </c:when>
     <c:otherwise>
-        <div class="card shadow-sm border-0">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="table-light">
-                    <tr><th>Mã đơn</th><th>Thời gian</th><th>Khách hàng</th><th>Trạng thái</th><th class="text-end">Tổng tiền</th><th></th></tr>
-                    </thead>
-                    <tbody>
-                    <c:forEach var="order" items="${orders.content}">
-                        <tr>
-                            <td class="fw-semibold"><c:out value="${order.code}"/></td>
-                            <td class="text-nowrap"><c:out value="${order.createdAt.format(dateTimeFormatter)}"/></td>
-                            <td><c:out value="${order.user.fullName}"/><br><span class="small text-muted"><c:out value="${order.receiverPhone}"/></span></td>
-                            <td><span class="badge ${order.status.badgeClass}"><c:out value="${order.status.label}"/></span></td>
-                            <td class="text-end fw-semibold"><fmt:formatNumber value="${order.totalAmount}" type="number"/> đ</td>
-                            <td class="text-end"><a class="btn btn-sm btn-outline-primary" href="<c:url value='/staff/orders/${order.code}'/>">Xem</a></td>
-                        </tr>
-                    </c:forEach>
-                    </tbody>
-                </table>
-            </div>
+        <div class="staff-work-list">
+            <c:forEach var="order" items="${orders}">
+                <c:set var="actionUrl" value="/staff/orders/${order.code}/accept"/>
+                <c:set var="actionLabel" value="Nhận đơn & bắt đầu pha chế"/>
+                <c:set var="actionHelp" value="Xác nhận đã kiểm tra đơn và bắt đầu pha chế. Đơn sẽ được chuyển sang trang xử lý."/>
+                <c:set var="actionReturn" value=""/>
+                <%@ include file="_work-order-card.jspf" %>
+            </c:forEach>
         </div>
-
-        <c:if test="${orders.totalPages > 1}">
-            <nav class="mt-4" aria-label="Phân trang đơn hàng">
-                <ul class="pagination justify-content-center">
-                    <c:forEach begin="1" end="${orders.totalPages}" var="p">
-                        <li class="page-item ${p == orders.number + 1 ? 'active' : ''}">
-                            <a class="page-link" href="<c:url value='/staff/orders'><c:param name='status' value='${selectedStatus}'/><c:param name='q' value='${q}'/><c:param name='page' value='${p}'/></c:url>">${p}</a>
-                        </li>
-                    </c:forEach>
-                </ul>
-            </nav>
-        </c:if>
     </c:otherwise>
 </c:choose>
 </body>

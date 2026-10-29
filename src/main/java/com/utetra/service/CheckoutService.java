@@ -18,6 +18,7 @@ import com.utetra.entity.User;
 import com.utetra.entity.enums.OrderStatus;
 import com.utetra.entity.enums.PaymentMethod;
 import com.utetra.entity.enums.PaymentStatus;
+import com.utetra.event.OrderNotificationEvent;
 import com.utetra.repository.BranchRepository;
 import com.utetra.repository.CartRepository;
 import com.utetra.repository.OrderRepository;
@@ -25,6 +26,7 @@ import com.utetra.repository.OrderStatusHistoryRepository;
 import com.utetra.repository.PaymentRepository;
 import com.utetra.repository.UserRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -45,16 +47,19 @@ public class CheckoutService {
     private final OrderRepository orderRepository;
     private final OrderStatusHistoryRepository historyRepository;
     private final PaymentRepository paymentRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     public CheckoutService(CartRepository cartRepository, UserRepository userRepository,
                            BranchRepository branchRepository, OrderRepository orderRepository,
-                           OrderStatusHistoryRepository historyRepository, PaymentRepository paymentRepository) {
+                           OrderStatusHistoryRepository historyRepository, PaymentRepository paymentRepository,
+                           ApplicationEventPublisher eventPublisher) {
         this.cartRepository = cartRepository;
         this.userRepository = userRepository;
         this.branchRepository = branchRepository;
         this.orderRepository = orderRepository;
         this.historyRepository = historyRepository;
         this.paymentRepository = paymentRepository;
+        this.eventPublisher = eventPublisher;
     }
 
     @Transactional(readOnly = true)
@@ -95,6 +100,12 @@ public class CheckoutService {
         for (CartItem item : cart.getItems()) {
             if (!item.getProduct().isAvailable() || !item.getProduct().getCategory().isActive()) {
                 throw new CheckoutException("Có sản phẩm đã ngừng bán, vui lòng kiểm tra lại giỏ hàng");
+            }
+            if (item.getProduct().isSoldOut()) {
+                throw new CheckoutException("Có món đang tạm hết, vui lòng chọn món khác hoặc thử lại sau");
+            }
+            if (!item.getProduct().getCategory().isAllowToppings() && !item.getToppings().isEmpty()) {
+                throw new CheckoutException("Giỏ hàng có topping không phù hợp với loại thức uống, vui lòng kiểm tra lại");
             }
             if (item.getToppings().stream().anyMatch(topping -> !topping.isAvailable())) {
                 throw new CheckoutException("Có topping đã ngừng phục vụ, vui lòng kiểm tra lại giỏ hàng");
@@ -139,6 +150,10 @@ public class CheckoutService {
         }
 
         cart.getItems().clear();
+        if (saved.getPaymentMethod() == PaymentMethod.COD) {
+            eventPublisher.publishEvent(OrderNotificationEvent.newOrder(
+                    saved.getId(), saved.getCode(), branch.getId(), user.getId(), PaymentMethod.COD));
+        }
         return new CheckoutResult(saved, vnpayRequest);
     }
 

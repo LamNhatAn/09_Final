@@ -7,9 +7,11 @@ import com.utetra.entity.Payment;
 import com.utetra.entity.enums.OrderStatus;
 import com.utetra.entity.enums.PaymentMethod;
 import com.utetra.entity.enums.PaymentStatus;
+import com.utetra.event.OrderNotificationEvent;
 import com.utetra.repository.OrderRepository;
 import com.utetra.repository.PaymentRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -27,12 +29,14 @@ public class VnpayPaymentService {
     private final VnpayGateway gateway;
     private final PaymentRepository paymentRepository;
     private final OrderRepository orderRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     public VnpayPaymentService(VnpayGateway gateway, PaymentRepository paymentRepository,
-                               OrderRepository orderRepository) {
+                               OrderRepository orderRepository, ApplicationEventPublisher eventPublisher) {
         this.gateway = gateway;
         this.paymentRepository = paymentRepository;
         this.orderRepository = orderRepository;
+        this.eventPublisher = eventPublisher;
     }
 
     @Transactional
@@ -87,6 +91,11 @@ public class VnpayPaymentService {
         }
         paymentRepository.save(payment);
         orderRepository.save(order);
+        if (paid) {
+            eventPublisher.publishEvent(OrderNotificationEvent.newOrder(
+                    order.getId(), order.getCode(), order.getBranch().getId(),
+                    order.getUser().getId(), PaymentMethod.VNPAY));
+        }
         return new VnpayCallbackOutcome(VnpayCallbackOutcome.Type.PROCESSED,
                 order.getCode(), payment.getStatus());
     }

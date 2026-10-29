@@ -26,6 +26,7 @@
                     <th>Tên</th>
                     <th>Mô tả</th>
                     <th class="text-center">Số sản phẩm</th>
+                    <th>Topping</th>
                     <th>Trạng thái</th>
                     <th class="text-end" style="width:260px">Thao tác</th>
                 </tr>
@@ -43,6 +44,7 @@
                                 </c:otherwise>
                             </c:choose>
                         </td>
+                        <td><c:choose><c:when test="${cat.allowToppings}"><span class="badge text-bg-info">Được chọn topping</span></c:when><c:otherwise><span class="text-muted small">Không áp dụng</span></c:otherwise></c:choose></td>
                         <td>
                             <c:choose>
                                 <c:when test="${cat.active}"><span class="badge text-bg-success">Đang hiển thị</span></c:when>
