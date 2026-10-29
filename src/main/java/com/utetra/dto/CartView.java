@@ -25,4 +25,8 @@ public record CartView(List<CartLine> lines, int totalQuantity, BigDecimal subto
     public boolean isEmpty() {
         return lines.isEmpty();
     }
+
+    public boolean isSoldOutItemPresent() {
+        return lines.stream().anyMatch(line -> line.item().getProduct().isSoldOut());
+    }
 }

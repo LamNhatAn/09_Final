@@ -43,6 +43,10 @@ public class Product {
     @Column(nullable = false)
     private boolean available = true;
 
+    /** STAFF bật khi món tạm hết. Sản phẩm vẫn hiện trên menu nhưng khách không thể đặt. */
+    @Column(nullable = false)
+    private boolean soldOut = false;
+
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;

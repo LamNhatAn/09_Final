@@ -3,14 +3,18 @@ package com.utetra.service;
 import com.utetra.dto.AdminOrderDetail;
 import com.utetra.entity.Order;
 import com.utetra.entity.OrderStatusHistory;
+import com.utetra.entity.Branch;
+import com.utetra.entity.User;
 import com.utetra.entity.enums.OrderStatus;
 import com.utetra.entity.enums.PaymentMethod;
 import com.utetra.entity.enums.PaymentStatus;
+import com.utetra.event.OrderNotificationEvent;
 import com.utetra.repository.OrderRepository;
 import com.utetra.repository.OrderStatusHistoryRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -35,13 +39,15 @@ class AdminOrderServiceTest {
 
     private OrderRepository orderRepository;
     private OrderStatusHistoryRepository historyRepository;
+    private ApplicationEventPublisher eventPublisher;
     private AdminOrderService service;
 
     @BeforeEach
     void setUp() {
         orderRepository = mock(OrderRepository.class);
         historyRepository = mock(OrderStatusHistoryRepository.class);
-        service = new AdminOrderService(orderRepository, historyRepository);
+        eventPublisher = mock(ApplicationEventPublisher.class);
+        service = new AdminOrderService(orderRepository, historyRepository, eventPublisher);
     }
 
     @Test
@@ -101,6 +107,7 @@ class AdminOrderServiceTest {
         verify(historyRepository).save(captor.capture());
         assertEquals(OrderStatus.CONFIRMED, captor.getValue().getStatus());
         assertEquals(99L, captor.getValue().getChangedBy());
+        verify(eventPublisher).publishEvent(any(OrderNotificationEvent.class));
     }
 
     @Test
@@ -144,6 +151,13 @@ class AdminOrderServiceTest {
         order.setId(10L);
         order.setCode("UTE-1");
         order.setStatus(status);
+        order.setPaymentMethod(PaymentMethod.COD);
+        Branch branch = new Branch();
+        branch.setId(3L);
+        order.setBranch(branch);
+        User user = new User();
+        user.setId(7L);
+        order.setUser(user);
         return order;
     }
 }

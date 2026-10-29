@@ -28,7 +28,9 @@ public class CheckoutForm {
     private String receiverPhone;
 
     @NotBlank(message = "Vui lòng nhập địa chỉ giao hàng")
-    @Size(max = 255, message = "Địa chỉ tối đa 255 ký tự")
+    @Size(min = 10, max = 255, message = "Địa chỉ giao hàng phải từ 10 đến 255 ký tự")
+    @Pattern(regexp = "^(?s)(?=.*[0-9])(?=.*[\\p{L}]).+$",
+            message = "Vui lòng nhập địa chỉ cụ thể, gồm số nhà và tên đường")
     private String deliveryAddress;
 
     @Size(max = 500, message = "Ghi chú tối đa 500 ký tự")

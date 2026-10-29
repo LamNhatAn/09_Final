@@ -80,5 +80,7 @@ public class AdminCategoryService {
         String description = form.getDescription() == null ? "" : form.getDescription().trim();
         category.setDescription(description.isEmpty() ? null : description);
         category.setActive(form.isActive());
+        // Quy tắc toàn hệ thống: chỉ danh mục Trà sữa được dùng topping.
+        category.setAllowToppings("Trà sữa".equalsIgnoreCase(category.getName()));
     }
 }

@@ -6,9 +6,10 @@ import com.utetra.entity.OrderStatusHistory;
 import com.utetra.entity.enums.OrderStatus;
 import com.utetra.entity.enums.PaymentMethod;
 import com.utetra.entity.enums.PaymentStatus;
+import com.utetra.event.OrderNotificationEvent;
 import com.utetra.repository.OrderRepository;
 import com.utetra.repository.OrderStatusHistoryRepository;
-import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -16,13 +17,20 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@RequiredArgsConstructor
 public class AdminOrderService {
 
     private static final int PAGE_SIZE = 10;
 
     private final OrderRepository orderRepository;
     private final OrderStatusHistoryRepository historyRepository;
+    private final ApplicationEventPublisher eventPublisher;
+
+    public AdminOrderService(OrderRepository orderRepository, OrderStatusHistoryRepository historyRepository,
+                             ApplicationEventPublisher eventPublisher) {
+        this.orderRepository = orderRepository;
+        this.historyRepository = historyRepository;
+        this.eventPublisher = eventPublisher;
+    }
 
     @Transactional(readOnly = true)
     public Page<Order> list(Long branchId, OrderStatus status, String keyword, int page) {
@@ -65,6 +73,9 @@ public class AdminOrderService {
         history.setStatus(next);
         history.setChangedBy(adminId);
         historyRepository.save(history);
+        eventPublisher.publishEvent(OrderNotificationEvent.statusChanged(
+                order.getId(), order.getCode(), order.getBranch().getId(), order.getUser().getId(),
+                next, order.getPaymentMethod()));
         return next;
     }
 

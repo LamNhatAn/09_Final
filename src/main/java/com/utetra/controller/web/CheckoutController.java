@@ -43,8 +43,12 @@ public class CheckoutController {
 
     @GetMapping
     public String form(@AuthenticationPrincipal AppUserDetails user, Model model) {
-        if (cartService.getView(user.getId()).isEmpty()) {
+        var cart = cartService.getView(user.getId());
+        if (cart.isEmpty()) {
             return "redirect:/cart?err=invalid";
+        }
+        if (cart.isSoldOutItemPresent()) {
+            return "redirect:/cart?err=changed";
         }
         model.addAttribute("checkoutForm", checkoutService.defaultForm(user.getId()));
         fillModel(user.getId(), model);

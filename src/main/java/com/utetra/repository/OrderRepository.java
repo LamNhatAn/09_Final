@@ -11,8 +11,32 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.Optional;
+import java.util.List;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 public interface OrderRepository extends JpaRepository<Order, Long> {
+
+    long countByStatus(com.utetra.entity.enums.OrderStatus status);
+
+    @Query("select count(o) from Order o where o.status in :statuses")
+    long countByStatusIn(@Param("statuses") java.util.Collection<com.utetra.entity.enums.OrderStatus> statuses);
+
+    @Query("select count(o) from Order o where o.status = :status and o.updatedAt >= :from and o.updatedAt < :to")
+    long countCompletedBetween(@Param("status") com.utetra.entity.enums.OrderStatus status,
+                               @Param("from") LocalDateTime from,
+                               @Param("to") LocalDateTime to);
+
+    @Query("select coalesce(sum(o.totalAmount), 0) from Order o where o.status = :status")
+    BigDecimal sumTotalByStatus(@Param("status") com.utetra.entity.enums.OrderStatus status);
+
+    @Query("select coalesce(sum(o.totalAmount), 0) from Order o where o.status = :status and o.updatedAt >= :from and o.updatedAt < :to")
+    BigDecimal sumTotalByStatusBetween(@Param("status") com.utetra.entity.enums.OrderStatus status,
+                                       @Param("from") LocalDateTime from,
+                                       @Param("to") LocalDateTime to);
+
+    @EntityGraph(attributePaths = {"branch", "user"})
+    List<Order> findTop5ByOrderByCreatedAtDesc();
 
     Optional<Order> findByCode(String code);
 

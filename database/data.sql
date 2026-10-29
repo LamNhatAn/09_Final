@@ -28,6 +28,8 @@ INSERT INTO categories (name, description) VALUES
  (N'Cà phê',       N'Cà phê pha phin và pha máy'),
  (N'Đá xay',       N'Thức uống đá xay mát lạnh');
 
+UPDATE categories SET allow_toppings = 1 WHERE name = N'Trà sữa';
+
 /* ---------- San pham (anh se upload len Cloudinary o Day 5) ---------- */
 INSERT INTO products (category_id, name, description, base_price) VALUES
  (1, N'Trà sữa trân châu đen',  N'Trà sữa truyền thống kèm trân châu đen dai ngon', 35000),

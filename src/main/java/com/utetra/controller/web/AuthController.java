@@ -2,12 +2,15 @@ package com.utetra.controller.web;
 
 import com.utetra.dto.LoginForm;
 import com.utetra.dto.RegisterForm;
+import com.utetra.dto.RegistrationOtpForm;
 import com.utetra.entity.enums.Role;
 import com.utetra.security.AppUserDetails;
 import com.utetra.security.AuthCookieService;
 import com.utetra.security.JwtService;
-import com.utetra.service.AuthService;
 import com.utetra.service.EmailAlreadyUsedException;
+import com.utetra.service.EmailDeliveryException;
+import com.utetra.service.RegistrationOtpException;
+import com.utetra.service.RegistrationOtpService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpHeaders;
@@ -31,14 +34,14 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
     private final AuthCookieService cookieService;
-    private final AuthService authService;
+    private final RegistrationOtpService registrationOtpService;
 
     public AuthController(AuthenticationManager authenticationManager, JwtService jwtService,
-                          AuthCookieService cookieService, AuthService authService) {
+                          AuthCookieService cookieService, RegistrationOtpService registrationOtpService) {
         this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
         this.cookieService = cookieService;
-        this.authService = authService;
+        this.registrationOtpService = registrationOtpService;
     }
 
     @GetMapping("/login")
@@ -92,15 +95,69 @@ public class AuthController {
         }
         if (!result.hasErrors()) {
             try {
-                authService.register(form);
-                return "redirect:/login?registered";
+                String email = registrationOtpService.start(form);
+                return "redirect:/register/verify?email=" + urlEncode(email);
             } catch (EmailAlreadyUsedException e) {
                 result.rejectValue("email", "duplicate", "Email này đã được đăng ký");
+            } catch (EmailDeliveryException e) {
+                result.reject("email.send", "Không gửi được OTP. Vui lòng kiểm tra cấu hình email gửi và thử lại.");
+            } catch (RegistrationOtpException e) {
+                result.reject("otp.start", e.getMessage());
             }
         }
         form.setPassword(null);
         form.setConfirmPassword(null);
         return "auth/register";
+    }
+
+    @GetMapping("/register/verify")
+    public String verifyRegistrationPage(@AuthenticationPrincipal AppUserDetails user,
+                                         @RequestParam(required = false) String email,
+                                         @RequestParam(required = false) String sent,
+                                         Model model) {
+        if (user != null) {
+            return "redirect:" + homeFor(user.getRole());
+        }
+        if (email == null || email.isBlank()) {
+            return "redirect:/register";
+        }
+        RegistrationOtpForm form = new RegistrationOtpForm();
+        form.setEmail(email.trim());
+        model.addAttribute("otpForm", form);
+        model.addAttribute("maskedEmail", maskEmail(email));
+        model.addAttribute("sentMessage", "1".equals(sent) ? "Đã gửi một mã OTP mới." : null);
+        return "auth/register-verify";
+    }
+
+    @PostMapping("/register/verify")
+    public String verifyRegistration(@Valid @ModelAttribute("otpForm") RegistrationOtpForm form,
+                                     BindingResult result, Model model) {
+        if (!result.hasErrors()) {
+            try {
+                registrationOtpService.verify(form.getEmail(), form.getCode());
+                return "redirect:/login?registered";
+            } catch (RegistrationOtpException e) {
+                result.rejectValue("code", "otp.invalid", e.getMessage());
+            }
+        }
+        form.setCode(null);
+        model.addAttribute("maskedEmail", maskEmail(form.getEmail()));
+        return "auth/register-verify";
+    }
+
+    @PostMapping("/register/resend")
+    public String resendRegistrationOtp(@RequestParam String email, Model model) {
+        RegistrationOtpForm form = new RegistrationOtpForm();
+        form.setEmail(email == null ? "" : email.trim());
+        try {
+            registrationOtpService.resend(email);
+            return "redirect:/register/verify?email=" + urlEncode(form.getEmail()) + "&sent=1";
+        } catch (RegistrationOtpException | EmailDeliveryException e) {
+            model.addAttribute("otpForm", form);
+            model.addAttribute("maskedEmail", maskEmail(email));
+            model.addAttribute("resendError", e.getMessage());
+            return "auth/register-verify";
+        }
     }
 
     private static String homeFor(Role role) {
@@ -119,5 +176,20 @@ public class AuthController {
         boolean internal = next.startsWith("/") && !next.startsWith("//") && !next.startsWith("/\\")
                 && next.chars().noneMatch(c -> c < 0x20 || c == '\\');
         return internal && !next.startsWith("/login") && !next.startsWith("/register") ? next : null;
+    }
+
+    private static String maskEmail(String email) {
+        if (email == null || !email.contains("@")) {
+            return "email của bạn";
+        }
+        String value = email.trim();
+        int at = value.indexOf('@');
+        String local = value.substring(0, at);
+        String visible = local.length() <= 2 ? local.substring(0, 1) : local.substring(0, 2);
+        return visible + "***" + value.substring(at);
+    }
+
+    private static String urlEncode(String value) {
+        return java.net.URLEncoder.encode(value == null ? "" : value, java.nio.charset.StandardCharsets.UTF_8);
     }
 }

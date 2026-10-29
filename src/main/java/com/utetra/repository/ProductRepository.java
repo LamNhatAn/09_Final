@@ -87,4 +87,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     /** Moi dong la [categoryId, so san pham]; dung cho cot "So san pham" o trang quan ly danh muc. */
     @Query("select p.category.id, count(p) from Product p group by p.category.id")
     List<Object[]> countByCategory();
+
+    long countByAvailableTrueAndSoldOutFalse();
 }
