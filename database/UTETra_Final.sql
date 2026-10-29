@@ -403,4 +403,3 @@ UNION ALL SELECT N'products', COUNT(*) FROM products
 UNION ALL SELECT N'sizes', COUNT(*) FROM sizes
 UNION ALL SELECT N'toppings', COUNT(*) FROM toppings;
 GO
-
