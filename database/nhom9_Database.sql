@@ -1,5 +1,5 @@
 -- UTETra - Database cuối kỳ (cấu trúc + dữ liệu mẫu trong một file)
--- Chạy bằng: sqlcmd -S localhost -E -C -f 65001 -i database\UTETra_Final.sql
+-- Chạy bằng: sqlcmd -S localhost -E -C -f 65001 -i database\nhom9_Database.sql
 -- LƯU Ý: phần schema bên dưới xóa và tạo lại toàn bộ bảng hiện có.
 
 -- ================================================================

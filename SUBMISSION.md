@@ -3,7 +3,7 @@
 ## 1. Thành phần nộp
 
 - **Source code:** toàn bộ repository này, không bao gồm file cấu hình bí mật `application-local.properties`.
-- **Database SQL nộp bài:** `database/UTETra_Final.sql` là file độc lập duy nhất, chứa cả cấu trúc và dữ liệu mẫu. `schema.sql`, `data.sql` và các file `day*.sql` được giữ lại để phát triển, cài đặt từng phần hoặc nâng cấp database cũ.
+- **Database SQL nộp bài:** `database/nhom9_Database.sql` là file độc lập duy nhất, chứa cả cấu trúc và dữ liệu mẫu. `schema.sql`, `data.sql` và các file `day*.sql` được giữ lại để phát triển, cài đặt từng phần hoặc nâng cấp database cũ.
 - **Datasheet AI:** `docs/AI_DATASHEET.md`.
 - **GitHub:** <https://github.com/LamNhatAn/09_Final>
 - **Cấu hình mẫu:** `application-local.properties.example`. Người chấm sao chép thành `application-local.properties` và tự điền khóa DB, JWT, Cloudinary, VNPay sandbox và email SMTP.
@@ -69,10 +69,10 @@ Không đưa mật khẩu, API Secret, HashSecret, App Password hoặc JWT secre
 Chạy tại thư mục gốc dự án:
 
 ```powershell
-sqlcmd -S localhost -E -C -f 65001 -i database\UTETra_Final.sql
+sqlcmd -S localhost -E -C -f 65001 -i database\nhom9_Database.sql
 ```
 
-`UTETra_Final.sql` sẽ xóa và tạo lại các bảng, sau đó thêm dữ liệu mẫu; vì vậy chỉ dùng khi cài mới hoặc chấp nhận xóa dữ liệu hiện có.
+`nhom9_Database.sql` sẽ xóa và tạo lại các bảng, sau đó thêm dữ liệu mẫu; vì vậy chỉ dùng khi cài mới hoặc chấp nhận xóa dữ liệu hiện có.
 
 ## 5. Kiểm tra trước khi nộp
 

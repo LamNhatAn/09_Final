@@ -14,10 +14,10 @@ Thanh toán: COD và VNPay (sandbox). Thông báo realtime bằng WebSocket. Ả
 1. **Tạo database và dữ liệu mẫu** (chạy ở thư mục gốc dự án):
 
    ```powershell
-   sqlcmd -S localhost -E -C -f 65001 -i database\UTETra_Final.sql
+   sqlcmd -S localhost -E -C -f 65001 -i database\nhom9_Database.sql
    ```
 
-   `UTETra_Final.sql` là file nộp database thống nhất, chứa cả cấu trúc và dữ liệu mẫu. `-E` là xác thực Windows, `-f 65001` để đọc đúng tiếng Việt (UTF-8). Chạy lại file này sẽ xóa và tạo lại toàn bộ bảng.
+   `nhom9_Database.sql` là file nộp database thống nhất, chứa cả cấu trúc và dữ liệu mẫu. `-E` là xác thực Windows, `-f 65001` để đọc đúng tiếng Việt (UTF-8). Chạy lại file này sẽ xóa và tạo lại toàn bộ bảng.
    Nếu dùng SSMS: mở file bằng *File > Open > File*, chọn encoding UTF-8 rồi bấm Execute.
 
 2. **Tạo tài khoản SQL cho ứng dụng** (chạy 1 lần, bằng sqlcmd/SSMS với quyền quản trị):
